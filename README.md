@@ -97,7 +97,7 @@
 
     为了让 ChatApp 的 AI 大脑能够思考和回应，它需要连接到强大的外部 AI 服务平台。你需要为这些服务准备好“通行证”——也就是 API 密钥 (API Key)。
 
-    获取密钥通常需要在相应的 AI 服务提供商（如 OpenAI, 谷歌 AI, 阿里云通义千问, 智谱 AI, Moonshot AI, SiliconFlow 等）官网上注册并申请。
+    获取密钥通常需要在相应的 AI 服务提供商（如 OpenAI, Gemini, 阿里云通义千问, Claude, Moonshot AI, SiliconFlow 等）官网上注册并申请。
 
     配置过程很简单：
 
@@ -119,11 +119,7 @@
 
     **一点说明:** 使用这些外部 AI 服务通常会根据你的用量产生费用。请务必了解你所选用服务的定价策略，并自行负责可能产生的开销。
 
-3.  **配置 HanLP (如果需要本地中文处理):**
-    * [如果项目依赖 HanLP 本地数据] 为了让 ChatApp 在本地就能进行一些基础的中文处理（比如分词），可能需要下载 HanLP 的数据。通常，你需要从 HanLP 官网下载数据包，解压后把里面的 `data` 文件夹放到项目 `app/src/main/assets/` 路径下。
-    * [如果不需要或已内置，则忽略此步]
-
-4.  **编译运行:**
+3.  **编译运行:**
     * 在 Android Studio 里，菜单栏选择 `Build` > `Make Project`，然后点击绿色的运行按钮 ▶️。
     * 或者在项目根目录的终端里敲：`./gradlew assembleDebug` 然后 `./gradlew installDebug`。
     * 选择你的模拟器或连接好的安卓手机（需要 Android 8.0 或更高版本），稍等片刻，你的 ChatApp 就启动啦！
