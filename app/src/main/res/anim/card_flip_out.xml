@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:interpolator="@android:interpolator/accelerate_decelerate">
+    <!-- 从0度旋转到-90度 -->
+    <rotate
+        android:duration="300"
+        android:fromDegrees="0"
+        android:toDegrees="-90"
+        android:pivotX="50%"
+        android:pivotY="50%" />
+    <!-- 同时添加一点缩小和淡出效果 -->
+    <scale
+        android:duration="300"
+        android:fromXScale="1.0"
+        android:fromYScale="1.0"
+        android:toXScale="0.8"
+        android:toYScale="0.8"
+        android:pivotX="50%"
+        android:pivotY="50%" />
+    <alpha
+        android:duration="150"
+        android:fromAlpha="1.0"
+        android:toAlpha="0.0"
+        android:startOffset="150" />
+</set>

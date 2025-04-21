@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:paddingBottom="16dp">
+
+    <!-- 阴影增强层1 - 最大最浅 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/shadow_layer_1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="12dp"
+        app:cardBackgroundColor="#15000000"
+        app:cardCornerRadius="26dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/shadow_layer_2"
+        app:layout_constraintEnd_toEndOf="@id/memory_main_card"
+        app:layout_constraintStart_toStartOf="@id/memory_main_card"
+        app:layout_constraintTop_toTopOf="@id/memory_main_card" />
+
+    <!-- 阴影增强层2 - 中等大小和深度 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/shadow_layer_2"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="-2dp"
+        app:cardBackgroundColor="#22000000"
+        app:cardCornerRadius="25dp"
+        app:cardElevation="0dp"
+        app:layout_constraintTop_toTopOf="@id/memory_main_card"
+        app:layout_constraintBottom_toBottomOf="@id/memory_main_card"
+        app:layout_constraintStart_toStartOf="@id/memory_main_card"
+        app:layout_constraintEnd_toEndOf="@id/memory_main_card"/>
+
+    <!-- 主内容卡片 - 使用新的设计语言 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/memory_main_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:cardBackgroundColor="@color/card_background"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="10dp"
+        app:strokeWidth="0dp"
+        app:cardPreventCornerOverlap="true"
+        android:clipToPadding="false"
+        android:clipChildren="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp">
+
+            <!-- 标题区域 - 融合式渐变背景 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/memory_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/memory_header_gradient"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="18dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/memory_header_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="记忆详情"
+                    android:textColor="@color/text_primary"
+                    android:textSize="22sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.01"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/memory_category_chip" />
+
+                <TextView
+                    android:id="@+id/memory_header_date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="2023-11-15 18:30"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:layout_marginTop="4dp"
+                    app:layout_constraintTop_toBottomOf="@id/memory_header_title"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/memory_category_chip" />
+
+                <!-- 类别标签 - 增强立体感 (移除了chipElevation属性) -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/memory_category_chip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="兴趣爱好"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp"
+                    app:chipBackgroundColor="@color/card_background"
+                    app:chipStrokeColor="@color/primary"
+                    app:chipStrokeWidth="0.8dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- 内容分隔线 - 增强视觉分层 -->
+            <View
+                android:id="@+id/memory_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider"
+                android:alpha="0.3"
+                app:layout_constraintTop_toBottomOf="@id/memory_header" />
+
+            <!-- 内容区域 - 更优雅的排版和滚动效果 -->
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/memory_scroll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                android:clipToPadding="false"
+                android:scrollbars="none"
+                android:fadingEdgeLength="24dp"
+                android:requiresFadingEdge="vertical"
+                app:layout_constraintTop_toBottomOf="@id/memory_divider"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/memory_content_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:lineSpacingMultiplier="1.3"
+                    android:textIsSelectable="true"
+                    android:minHeight="100dp"
+                    tools:text="这是记忆内容示例。用户在对话中提到了他喜欢的音乐类型是古典音乐和爵士乐，特别欣赏莫扎特和迈尔斯·戴维斯的作品。" />
+            </androidx.core.widget.NestedScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

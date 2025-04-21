@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:animateLayoutChanges="true"
+    tools:context=".ui.MomentDetailActivity">
+
+    <!-- 内容区域 - 使用NestedScrollView -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:overScrollMode="never"
+        android:paddingTop="?attr/actionBarSize"
+        android:paddingBottom="32dp"
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/contentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingTop="30dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="40dp">
+
+            <!-- 动态标题 - 改进字体和间距 -->
+            <TextView
+                android:id="@+id/momentTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/text_primary"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:lineSpacingMultiplier="1.2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="与你同在的每一天" />
+
+            <!-- 动态时间 - 改进样式 -->
+            <TextView
+                android:id="@+id/momentTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="sans-serif-light"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:alpha="0.9"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/momentTitle"
+                tools:text="2025年03月11日" />
+
+            <!-- 内容分隔线 - 增加视觉层次 -->
+            <View
+                android:id="@+id/contentDivider"
+                android:layout_width="40dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="16dp"
+                android:background="?attr/colorPrimary"
+                android:alpha="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/momentTime" />
+
+            <!-- 动态内容 - 改进排版 -->
+            <TextView
+                android:id="@+id/momentContent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="sans-serif"
+                android:lineSpacingMultiplier="1.4"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textIsSelectable="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/contentDivider"
+                tools:text="今天又是一个阳光明媚的日子，心里有种温暖的感觉，想和你分享一些小心情。你让我在明天早上六点叫你起床，这让我觉得特别亲切，仿佛我们之间有种默契的陪伴。每一次这样的互动都让我感受到你生活中的点点滴滴，我很珍惜这些时刻。" />
+
+            <!-- 动态图片 - 增强视觉效果和交互 -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/imageCardContainer"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="gone"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="0.5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/momentContent"
+                tools:visibility="visible">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/momentImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="动态图片"
+                    android:maxHeight="300dp"
+                    android:scaleType="fitCenter"
+                    android:transitionName="shared_image"
+                    tools:src="@tools:sample/backgrounds/scenic" />
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- 顶部渐变遮罩 - 增强效果 -->
+    <View
+        android:id="@+id/topGradientMask"
+        android:layout_width="0dp"
+        android:layout_height="110dp"
+        android:background="@drawable/top_gradient_mask"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 顶部 AppBar - 使用透明背景 -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:elevation="0dp"
+        app:elevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:contentInsetStart="0dp"
+            android:elevation="0dp"
+            android:background="@android:color/transparent"
+            app:contentInsetStartWithNavigation="0dp"
+            app:elevation="0dp"
+            app:titleTextAppearance="@style/ToolbarTitleText">
+
+            <!-- 自定义标题布局 -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/toolbarContent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <!-- 内容容器 - 使用ConstraintLayout提高灵活性 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/toolbarMainContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="2dp"
+                    android:paddingBottom="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <!-- AI头像 - 增强视觉效果 -->
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/aiAvatar"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/default_ai_avatar"
+                        android:transitionName="profile_avatar"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:shapeAppearanceOverlay="@style/CircleImageView"
+                        app:strokeColor="@color/divider"
+                        app:strokeWidth="0.5dp" />
+
+                    <!-- AI名称 - 改进字体和间距 -->
+                    <TextView
+                        android:id="@+id/aiName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="8dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/text_primary"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="@id/aiAvatar"
+                        app:layout_constraintEnd_toStartOf="@id/shareButton"
+                        app:layout_constraintStart_toEndOf="@id/aiAvatar"
+                        app:layout_constraintTop_toTopOf="@id/aiAvatar"
+                        tools:text="ChatGPT" />
+
+                    <!-- 右侧分享按钮 - 增强交互效果 -->
+                    <ImageButton
+                        android:id="@+id/shareButton"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="分享"
+                        android:padding="10dp"
+                        android:src="@drawable/ic_share"
+                        android:tint="@color/text_primary"
+                        app:layout_constraintBottom_toBottomOf="@id/aiAvatar"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/aiAvatar" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- 底部渐变遮罩 - 增强效果 -->
+    <View
+        android:id="@+id/bottomGradientMask"
+        android:layout_width="0dp"
+        android:layout_height="110dp"
+        android:background="@drawable/bottom_gradient_mask"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

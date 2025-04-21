@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bottom_sheet_background"
+    android:paddingTop="20dp"
+    android:paddingBottom="24dp">
+
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="8dp"
+        android:text="发布动态"
+        android:textColor="@color/text_primary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/titleEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/edit_text_background"
+        android:hint="标题"
+        android:padding="16dp"
+        android:textSize="16sp"
+        android:textColorHint="@color/text_hint"
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dialogTitle" />
+
+    <EditText
+        android:id="@+id/contentEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/edit_text_background"
+        android:gravity="top|start"
+        android:hint="在这里输入动态内容..."
+        android:minHeight="150dp"
+        android:padding="16dp"
+        android:textSize="16sp"
+        android:textColorHint="@color/text_hint"
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleEditText" />
+
+    <ImageView
+        android:id="@+id/selectedImagePreview"
+        android:layout_width="0dp"
+        android:layout_height="150dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="20dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        android:background="@drawable/image_preview_background"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/contentEditText" />
+
+    <ImageButton
+        android:id="@+id/removeImageButton"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/circle_button_background"
+        android:src="@drawable/ic_close"
+        android:tint="@color/text_white"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/selectedImagePreview"
+        app:layout_constraintTop_toTopOf="@id/selectedImagePreview" />
+
+    <!-- 按钮 -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/selectImageButton"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="24dp"
+        android:text="图片"
+        android:textSize="16sp"
+        android:textColor="@color/primary"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:minWidth="90dp"
+        app:cornerRadius="24dp"
+        app:icon="@drawable/ic_image"
+        app:iconSize="24dp"
+        app:iconTint="@color/primary"
+        app:iconGravity="textStart"
+        app:iconPadding="8dp"
+        app:strokeColor="@color/primary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selectedImagePreview" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/cancelButton"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:text="取消"
+        android:textSize="16sp"
+        android:textColor="@color/text_secondary"
+        android:minWidth="90dp"
+        app:cornerRadius="24dp"
+        app:strokeColor="@color/text_secondary"
+        app:layout_constraintEnd_toStartOf="@id/confirmButton"
+        app:layout_constraintTop_toTopOf="@id/selectImageButton"
+        app:layout_constraintBottom_toBottomOf="@id/selectImageButton" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/confirmButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:backgroundTint="@color/primary"
+        android:text="确认"
+        android:textColor="@color/text_white"
+        android:textSize="16sp"
+        android:minWidth="90dp"
+        app:cornerRadius="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/selectImageButton"
+        app:layout_constraintBottom_toBottomOf="@id/selectImageButton" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

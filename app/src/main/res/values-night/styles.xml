@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 深色主题覆盖 -->
+    <style name="Theme.ChatApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- 主要颜色 -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+
+        <!-- 状态栏和导航栏定制 -->
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/background</item>
+
+        <!-- 文本颜色 -->
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+
+        <!-- 背景颜色 -->
+        <item name="android:windowBackground">@color/background</item>
+
+        <!-- 波纹效果 -->
+        <item name="colorControlHighlight">#40FFFFFF</item>
+
+        <!-- 工具栏样式 -->
+        <item name="toolbarStyle">@style/Widget.ChatApp.Toolbar</item>
+
+        <!-- 应用菜单样式 -->
+        <item name="android:popupMenuStyle">@style/PopupMenuStyle</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/PopupMenuItemStyle</item>
+        <item name="android:textAppearanceSmallPopupMenu">@style/PopupMenuItemStyle</item>
+
+        <!-- 全局禁用阴影 -->
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:outlineProvider">none</item>
+
+        <!-- Material组件扁平化 -->
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="materialCardViewStyle">@style/Widget.ChatApp.CardView.Flat</item>
+
+        <!-- 禁用手势导航的关键属性 -->
+        <item name="android:windowSwipeToDismiss">false</item>
+        <item name="android:windowDisablePreview">true</item>
+
+        <!-- 处理边缘滑动手势 -->
+        <item name="android:windowLayoutInDisplayCutoutMode">default</item>
+        <item name="android:windowEnableSplitTouch">false</item>
+
+        <!-- 防止内容延伸到导航栏区域 -->
+        <item name="android:enforceNavigationBarContrast">false</item>
+
+        <!-- 明确设置输入模式，处理键盘与导航的交互 -->
+        <item name="android:windowSoftInputMode">adjustResize|stateAlwaysHidden</item>
+    </style>
+
+    <!-- 工具栏样式 -->
+    <style name="Widget.ChatApp.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">@color/background</item>
+        <item name="android:elevation">0dp</item>
+        <item name="elevation">0dp</item>
+        <item name="titleTextAppearance">@style/ToolbarTitleText</item>
+    </style>
+
+    <!-- 工具栏标题文本样式 -->
+    <style name="ToolbarTitleText" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- 底部表单样式（深色模式） -->
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:elevation">0dp</item>
+        <item name="behavior_hideable">false</item>
+        <item name="behavior_skipCollapsed">true</item>
+        <item name="behavior_draggable">false</item>
+    </style>
+
+    <style name="TransparentBottomSheet" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:elevation">0dp</item>
+        <item name="elevation">0dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceBottomSheetDialog</item>
+        <item name="behavior_draggable">false</item>
+        <item name="behavior_skipCollapsed">true</item>
+    </style>
+
+    <style name="Widget.ChatApp.BottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.ChatApp.LargeComponent</item>
+        <item name="backgroundTint">@color/background</item>
+        <item name="behavior_peekHeight">480dp</item>
+        <item name="behavior_draggable">false</item>
+        <item name="behavior_fitToContents">true</item>
+    </style>
+
+    <style name="RoundedBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/RoundedShapeAppearance</item>
+        <item name="behavior_draggable">false</item>
+        <item name="behavior_skipCollapsed">true</item>
+    </style>
+
+    <style name="CustomBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="android:background">@drawable/bottom_sheet_background</item>
+        <item name="behavior_draggable">false</item>
+        <item name="behavior_skipCollapsed">true</item>
+    </style>
+
+    <!-- 扁平卡片样式（深色模式） -->
+    <style name="Widget.ChatApp.CardView.Flat" parent="Widget.MaterialComponents.CardView">
+        <item name="cardElevation">0dp</item>
+        <item name="cardPreventCornerOverlap">false</item>
+    </style>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- 现有的路径配置 -->
+    <external-files-path
+        name="external_files"
+        path="." />
+    <external-files-path
+        name="documents"
+        path="Documents/exports" />
+
+    <!-- 路径配置，支持裁剪功能 -->
+    <external-path name="external" path="."/>
+    <cache-path name="cache" path="."/>
+    <files-path name="files" path="."/>
+
+    <!-- 临时图片文件路径 -->
+    <root-path name="root" path="."/>
+</paths>

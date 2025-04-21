@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/rounded_content_background"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="删除消息"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="确定要删除这条消息吗？此操作不可撤销。"
+        android:textColor="@color/text_secondary"
+        android:textSize="16sp"
+        android:layout_marginBottom="24dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <!-- 取消按钮 -->
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="16dp"
+            android:background="@android:color/transparent"
+            android:foreground="@drawable/ic_close_green"
+            android:foregroundGravity="center"
+            android:contentDescription="取消"
+            style="?android:attr/borderlessButtonStyle"/>
+
+        <!-- 删除按钮 -->
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="@android:color/transparent"
+            android:foreground="@drawable/ic_check_red"
+            android:foregroundGravity="center"
+            android:contentDescription="删除"
+            style="?android:attr/borderlessButtonStyle"/>
+    </LinearLayout>
+</LinearLayout>

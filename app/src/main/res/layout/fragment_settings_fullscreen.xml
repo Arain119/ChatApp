@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background"
+    android:animateLayoutChanges="true">
+
+    <!-- 标题栏 - 包含返回按钮和标题 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp">
+
+        <!-- 返回按钮 - 添加触感反馈 -->
+        <ImageView
+            android:id="@+id/back_icon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:contentDescription="返回"
+            android:focusable="true"
+            android:padding="6dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/text_primary" />
+
+        <!-- 标题文本 -->
+        <TextView
+            android:id="@+id/settings_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:singleLine="true"
+            android:text="设置"
+            android:textColor="@color/text_primary"
+            android:textSize="32sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 设置项内容容器 -->
+    <FrameLayout
+        android:id="@+id/settings_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>

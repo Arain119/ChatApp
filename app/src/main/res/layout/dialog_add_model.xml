@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/rounded_dialog_background"
+    android:padding="20dp"
+    android:elevation="8dp">
+
+    <!-- 标题 - 减小字体和下边距 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="添加自定义模型"
+        android:textColor="@color/text_primary"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
+
+    <!-- 输入框 - 减小高度和边距 -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        app:boxBackgroundMode="outline"
+        app:boxCornerRadiusBottomEnd="20dp"
+        app:boxCornerRadiusBottomStart="20dp"
+        app:boxCornerRadiusTopEnd="20dp"
+        app:boxCornerRadiusTopStart="20dp"
+        app:boxStrokeColor="?attr/colorPrimary"
+        app:hintTextColor="?attr/colorPrimary">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/model_name_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="如：gpt-4.5"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:padding="12dp"
+            android:textSize="15sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- 按钮区域 - 减小按钮高度 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <!-- 取消按钮 - 减小高度和内边距 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="取消"
+            android:textColor="@color/text_primary"
+            android:layout_marginEnd="12dp"
+            app:cornerRadius="16dp"
+            android:paddingHorizontal="16dp"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:textSize="14sp" />
+
+        <!-- 添加按钮 - 减小高度和内边距 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="添加"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="16dp"
+            app:backgroundTint="?attr/colorPrimary"
+            android:paddingHorizontal="16dp"
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 底部表单相关尺寸 -->
+    <dimen name="bottomsheet_elevation">4dp</dimen>
+    <dimen name="bottom_sheet_height">220dp</dimen>
+    <dimen name="settings_text_size">16sp</dimen>
+    <dimen name="bottom_sheet_peek_height">64dp</dimen>
+
+    <!-- 扩展标题相关尺寸 -->
+    <dimen name="expanded_title_margin_top">40dp</dimen>
+    <dimen name="expanded_title_text_size">24sp</dimen>
+
+    <!-- 按钮内边距 -->
+    <dimen name="button_padding">12dp</dimen>
+    <dimen name="corner_radius">12dp</dimen>
+    <dimen name="toggle_elevation">2dp</dimen>
+
+    <!-- 工具栏标题位置尺寸 -->
+    <dimen name="toolbar_title_margin_start">16dp</dimen>
+    <dimen name="toolbar_title_margin_top">12dp</dimen>
+    <dimen name="toolbar_title_text_size">24sp</dimen>
+    <dimen name="popup_menu_width">140dp</dimen>
+
+    <!-- 联网图标尺寸和位置 -->
+    <dimen name="network_icon_small_size">24dp</dimen>
+    <dimen name="network_icon_end_margin">16dp</dimen>
+    <dimen name="network_icon_top_margin">4dp</dimen>
+</resources>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- SDK版本声明 -->
+    <uses-sdk
+        android:minSdkVersion="26"
+        android:targetSdkVersion="35"
+        tools:overrideLibrary="com.yalantis.ucrop"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application
+        android:name=".ChatApplication"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="true"
+        android:theme="@style/Theme.ChatApp"
+        tools:targetApi="31">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.ApiManagementActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ChatApp"
+            android:label="API 管理" />
+        <activity
+            android:name=".ui.PermissionRequestActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ChatApp" />
+        <activity
+            android:name=".ui.AlarmFullScreenActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ChatApp.Fullscreen"
+            android:showOnLockScreen="true"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:excludeFromRecents="true"/>
+
+        <activity
+            android:name=".ui.CropActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ChatApp"
+            android:label="裁剪头像" />
+
+        <activity
+            android:name=".ui.ImageViewerActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:exported="false" />
+
+        <!-- 添加UCropActivity -->
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.UCrop" />
+
+        <!-- 动态页面 -->
+        <activity
+            android:name=".ui.MomentsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ChatApp" />
+        <activity
+            android:name=".ui.PrivacyPolicyActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ChatApp"
+            android:label="隐私政策">
+        </activity>
+
+        <!-- FileProvider 配置 -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:enableOnBackInvokedCallback="true"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+        <!-- 添加文档查看器Activity注册 -->
+        <activity
+            android:name=".ui.DocumentViewerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ChatApp"
+            android:label="文档查看器"
+            android:configChanges="orientation|screenSize" />
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup" />
+        </provider>
+
+        <activity
+            android:name=".ui.CustomUCropActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:screenOrientation="portrait"
+            android:exported="false" />
+        <activity
+            android:name=".ui.ProactiveMessageSettingsActivity"
+            android:theme="@style/Theme.ChatApp.NoActionBar"
+            android:enableOnBackInvokedCallback="false"
+            android:exported="false" />
+
+        <!-- 闹钟接收器 -->
+        <receiver
+            android:name=".service.AlarmReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.example.chatapp.ACTION_TRIGGER_ALARM" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 日记闹钟接收器 -->
+        <receiver
+            android:name=".service.DiaryAlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.example.chatapp.ACTION_GENERATE_DIARY" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 启动时重设闹钟接收器 -->
+        <receiver
+            android:name=".service.BootCompletedReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 闹钟关闭接收器 -->
+        <receiver
+            android:name=".service.AlarmDismissReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- 闹钟服务 -->
+        <service
+            android:name=".service.AlarmService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse" />
+
+        <!-- 闹钟重新调度服务 -->
+        <service
+            android:name=".service.AlarmRescheduleService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse" />
+
+        <activity
+            android:name=".ui.MomentDetailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.ChatApp" />
+
+    </application>
+</manifest>

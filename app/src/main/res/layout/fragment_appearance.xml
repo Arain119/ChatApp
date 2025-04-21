@@ -1,0 +1,570 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true"
+    android:overScrollMode="never">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="32dp">
+
+        <!-- 标题区域 -->
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="外观和主题"
+            android:textColor="@color/text_primary"
+            android:textSize="32sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- 说明文本 -->
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="选择您喜欢的应用主题与样式"
+            android:textColor="@color/text_secondary"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-light"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="20dp"
+            app:layout_constraintTop_toBottomOf="@id/title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- 选项容器 -->
+        <TextView
+            android:id="@+id/theme_options_header"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="主题模式"
+            android:textColor="@color/text_primary"
+            android:textSize="22sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold"
+            android:layout_marginTop="32dp"
+            android:layout_marginStart="4dp"
+            app:layout_constraintTop_toBottomOf="@id/subtitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- 主题选项卡片 - 加大圆角和阴影 -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/theme_options_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="2dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp"
+            app:strokeWidth="0.5dp"
+            app:strokeColor="@color/divider"
+            app:layout_constraintTop_toBottomOf="@id/theme_options_header"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:cardBackgroundColor="@color/card_background">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="2dp">
+
+                <!-- 浅色模式 - 减小内边距 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/theme_light"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="18dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="@drawable/rounded_ripple_effect">
+
+                    <!-- 包裹图标的圆形背景 -->
+                    <FrameLayout
+                        android:id="@+id/light_icon_container"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <ImageView
+                            android:id="@+id/light_icon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_light_mode"
+                            app:tint="@color/text_primary" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/light_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="浅色模式"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginStart="16dp"
+                        app:layout_constraintStart_toEndOf="@id/light_icon_container"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/light_check" />
+
+                    <TextView
+                        android:id="@+id/light_description"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="适合在明亮环境中使用"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-light"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="2dp"
+                        app:layout_constraintStart_toEndOf="@id/light_icon_container"
+                        app:layout_constraintTop_toBottomOf="@id/light_text"
+                        app:layout_constraintEnd_toStartOf="@id/light_check"
+                        android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/light_check"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_check"
+                        app:tint="?attr/colorPrimary"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider"
+                    android:layout_marginStart="74dp" />
+
+                <!-- 深色模式 - 减少内边距 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/theme_dark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="18dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="@drawable/rounded_ripple_effect">
+
+                    <!-- 包裹图标的圆形背景 -->
+                    <FrameLayout
+                        android:id="@+id/dark_icon_container"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <ImageView
+                            android:id="@+id/dark_icon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_dark_mode"
+                            app:tint="@color/text_primary" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/dark_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="深色模式"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginStart="16dp"
+                        app:layout_constraintStart_toEndOf="@id/dark_icon_container"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/dark_check" />
+
+                    <TextView
+                        android:id="@+id/dark_description"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="减少眼睛疲劳，节省电量"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-light"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="2dp"
+                        app:layout_constraintStart_toEndOf="@id/dark_icon_container"
+                        app:layout_constraintTop_toBottomOf="@id/dark_text"
+                        app:layout_constraintEnd_toStartOf="@id/dark_check"
+                        android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/dark_check"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_check"
+                        app:tint="?attr/colorPrimary"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider"
+                    android:layout_marginStart="74dp" />
+
+                <!-- 跟随系统 - 减少内边距 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/theme_system"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="18dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="@drawable/rounded_ripple_effect">
+
+                    <!-- 包裹图标的圆形背景 -->
+                    <FrameLayout
+                        android:id="@+id/system_icon_container"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
+
+                        <ImageView
+                            android:id="@+id/system_icon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_system_mode"
+                            app:tint="@color/text_primary" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/system_text"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="跟随系统"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp"
+                        android:fontFamily="sans-serif-medium"
+                        android:layout_marginStart="16dp"
+                        app:layout_constraintStart_toEndOf="@id/system_icon_container"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/system_check" />
+
+                    <TextView
+                        android:id="@+id/system_description"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="根据系统设置自动切换"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp"
+                        android:fontFamily="sans-serif-light"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="2dp"
+                        app:layout_constraintStart_toEndOf="@id/system_icon_container"
+                        app:layout_constraintTop_toBottomOf="@id/system_text"
+                        app:layout_constraintEnd_toStartOf="@id/system_check"
+                        android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/system_check"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/ic_check"
+                        app:tint="?attr/colorPrimary"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 主题说明 - 减少间距 -->
+        <TextView
+            android:id="@+id/theme_description"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="浅色和深色主题会影响整个应用的外观。跟随系统会根据您设备的系统设置自动切换。"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-light"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="4dp"
+            app:layout_constraintTop_toBottomOf="@id/theme_options_card"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- 颜色主题选择器标题 - 减少间距 -->
+        <TextView
+            android:id="@+id/color_theme_header"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="颜色主题"
+            android:textColor="@color/text_primary"
+            android:textSize="22sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold"
+            android:layout_marginTop="36dp"
+            android:layout_marginStart="4dp"
+            app:layout_constraintTop_toBottomOf="@id/theme_description"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- 颜色选择容器 - 加强立体感 -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/color_picker_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginHorizontal="2dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp"
+            app:strokeWidth="0.5dp"
+            app:strokeColor="@color/divider"
+            app:cardBackgroundColor="@color/card_background"
+            app:layout_constraintTop_toBottomOf="@id/color_theme_header"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="选择应用主题颜色"
+                    android:textColor="@color/text_primary"
+                    android:textSize="16sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:layout_marginBottom="14dp"/>
+
+                <HorizontalScrollView
+                    android:id="@+id/color_picker_scroll"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:overScrollMode="never">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="10dp">
+
+                        <!-- 默认蓝色 - 设置透明边框 -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/color_blue"
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:layout_marginHorizontal="6dp"
+                            app:cardCornerRadius="36dp"
+                            app:cardElevation="8dp"
+                            app:strokeWidth="0dp"
+                            app:strokeColor="@android:color/transparent"
+                            app:cardBackgroundColor="@color/primary"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <ImageView
+                                android:id="@+id/color_blue_check"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="20dp"
+                                android:src="@drawable/ic_check"
+                                app:tint="@color/white"
+                                android:visibility="visible" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- 绿色 -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/color_green"
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:layout_marginHorizontal="6dp"
+                            app:cardCornerRadius="36dp"
+                            app:cardElevation="4dp"
+                            app:strokeWidth="0dp"
+                            app:strokeColor="@android:color/transparent"
+                            app:cardBackgroundColor="@color/theme_green"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <ImageView
+                                android:id="@+id/color_green_check"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="20dp"
+                                android:src="@drawable/ic_check"
+                                app:tint="@color/white"
+                                android:visibility="invisible" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- 紫色 -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/color_purple"
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:layout_marginHorizontal="6dp"
+                            app:cardCornerRadius="36dp"
+                            app:cardElevation="4dp"
+                            app:strokeWidth="0dp"
+                            app:strokeColor="@android:color/transparent"
+                            app:cardBackgroundColor="@color/theme_purple"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <ImageView
+                                android:id="@+id/color_purple_check"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="20dp"
+                                android:src="@drawable/ic_check"
+                                app:tint="@color/white"
+                                android:visibility="invisible" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- 橙色 -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/color_orange"
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:layout_marginHorizontal="6dp"
+                            app:cardCornerRadius="36dp"
+                            app:cardElevation="4dp"
+                            app:strokeWidth="0dp"
+                            app:strokeColor="@android:color/transparent"
+                            app:cardBackgroundColor="@color/theme_orange"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <ImageView
+                                android:id="@+id/color_orange_check"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="20dp"
+                                android:src="@drawable/ic_check"
+                                app:tint="@color/white"
+                                android:visibility="invisible" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- 粉色 -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/color_pink"
+                            android:layout_width="72dp"
+                            android:layout_height="72dp"
+                            android:layout_marginHorizontal="6dp"
+                            app:cardCornerRadius="36dp"
+                            app:cardElevation="4dp"
+                            app:strokeWidth="0dp"
+                            app:strokeColor="@android:color/transparent"
+                            app:cardBackgroundColor="@color/theme_pink"
+                            android:clickable="true"
+                            android:focusable="true">
+
+                            <ImageView
+                                android:id="@+id/color_pink_check"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:padding="20dp"
+                                android:src="@drawable/ic_check"
+                                app:tint="@color/white"
+                                android:visibility="invisible" />
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="主题颜色会应用于按钮、滑块和其他控件元素上"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-light"
+                    android:layout_marginTop="14dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 底部装饰区域 - 减少间距，加强立体感 -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tips_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:layout_marginHorizontal="2dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="4dp"
+            app:strokeWidth="0.5dp"
+            app:strokeColor="@color/divider"
+            app:cardBackgroundColor="@color/card_background"
+            app:layout_constraintTop_toBottomOf="@id/color_picker_card"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="主题小贴士"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="深色模式可以减少夜间使用时的眼睛疲劳，还能节省OLED屏幕的电量消耗。"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-light"
+                    android:layout_marginTop="12dp"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="颜色主题的更改将在应用重启后生效。"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif-light"
+                    android:layout_marginTop="10dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

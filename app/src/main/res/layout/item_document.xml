@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="16dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="8dp">
+
+    <!-- 用户头像 -->
+    <ImageView
+        android:id="@+id/userAvatar"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="8dp"
+        android:padding="2dp"
+        android:src="@drawable/default_user_avatar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="用户头像" />
+
+    <!-- 文档卡片 - 米色填充的圆角长方形 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/documentCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="1dp"
+        app:cardBackgroundColor="#F5F2E9"
+        app:layout_constraintEnd_toStartOf="@id/userAvatar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintWidth_min="220dp"
+        app:layout_constraintWidth_max="300dp"
+        app:layout_constraintHorizontal_bias="1.0">
+
+        <!-- 文档内容布局 - 使用ConstraintLayout提供更好的控制 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp">
+
+            <!-- 文档图标 -->
+            <ImageView
+                android:id="@+id/documentIcon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_document"
+                app:tint="#9C7C56"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- 文档标题 -->
+            <TextView
+                android:id="@+id/documentTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:textColor="#4A3F35"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:breakStrategy="high_quality"
+                app:layout_constraintStart_toEndOf="@id/documentIcon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- 底部提示行 - 左侧显示提示文字 -->
+            <TextView
+                android:id="@+id/documentHint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="点击查看文档"
+                android:textColor="#8D7B6A"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="@id/documentTitle"
+                app:layout_constraintTop_toBottomOf="@id/documentTitle"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <!-- 文件类型和大小 - 显示在右下角 -->
+            <TextView
+                android:id="@+id/documentInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#72665B"
+                android:textSize="11sp"
+                android:background="@drawable/document_info_background"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/documentTitle"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

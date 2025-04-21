@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 背景轨道 -->
+    <item android:id="@android:id/background">
+        <shape android:shape="rectangle">
+            <corners android:radius="8dp" />
+            <solid android:color="@color/seekbar_track_background" />
+            <size android:height="6dp" />
+        </shape>
+    </item>
+
+    <!-- 进度部分 -->
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape android:shape="rectangle">
+                <corners android:radius="8dp" />
+                <gradient
+                    android:startColor="@color/primary_light"
+                    android:endColor="@color/primary"
+                    android:angle="0" />
+                <size android:height="6dp" />
+            </shape>
+        </clip>
+    </item>
+</layer-list>

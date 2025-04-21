@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:clipToPadding="false"
+    android:padding="16dp">
+
+    <!-- 标题 -->
+    <TextView
+        android:id="@+id/chat_history_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="聊天记录"
+        android:textColor="@color/text_primary"
+        android:textSize="32sp"
+        android:fontFamily="sans-serif-medium"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp"
+        android:shadowColor="#40000000"
+        android:shadowDx="0"
+        android:shadowDy="1"
+        android:shadowRadius="2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 子标题 -->
+    <TextView
+        android:id="@+id/chat_history_subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="管理您的所有对话"
+        android:textColor="@color/text_secondary"
+        android:textSize="16sp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/chat_history_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 搜索栏卡片 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/search_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:cardBackgroundColor="@color/card_background"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="8dp"
+        app:cardPreventCornerOverlap="true"
+        app:layout_constraintTop_toBottomOf="@id/chat_history_subtitle"
+        app:strokeWidth="0.5dp"
+        app:strokeColor="@color/divider">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:padding="4dp">
+
+            <EditText
+                android:id="@+id/search_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:hint="搜索聊天记录"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
+                android:paddingStart="16dp"
+                android:paddingEnd="48dp"
+                android:textSize="16sp"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:drawableStart="@drawable/ic_search"
+                android:drawablePadding="12dp"
+                android:drawableTint="@color/text_secondary" />
+
+            <ImageButton
+                android:id="@+id/clear_search_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_clear"
+                android:tint="@color/text_secondary"
+                android:visibility="gone"
+                android:contentDescription="清除搜索" />
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 内容卡片 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/content_card"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="14dp"
+        app:cardBackgroundColor="@color/card_background"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="10dp"
+        app:cardPreventCornerOverlap="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/search_card"
+        app:strokeWidth="0.5dp"
+        app:strokeColor="@color/divider">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingStart="12dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="80dp"
+                android:overScrollMode="never" />
+
+            <TextView
+                android:id="@+id/empty_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="暂无聊天记录"
+                android:textColor="@color/text_secondary"
+                android:textSize="16sp"
+                android:shadowColor="#40000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="1"
+                android:drawableTop="@drawable/ic_empty_chat"
+                android:drawableTint="@color/text_hint"
+                android:drawablePadding="16dp"
+                android:visibility="gone" />
+
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 新建对话按钮 - 增强阴影效果 -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_new_chat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:src="@drawable/ic_add"
+        android:contentDescription="新建对话"
+        app:tint="@color/text_white"
+        app:backgroundTint="?attr/colorPrimary"
+        app:borderWidth="0dp"
+        app:elevation="16dp"
+        app:pressedTranslationZ="12dp"
+        app:useCompatPadding="true"
+        app:fabSize="normal"
+        app:fabCustomSize="58dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

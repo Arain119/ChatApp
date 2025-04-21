@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">Alice</string>
+    <string name="message_hint">输入消息...</string>
+    <string name="send_description">发送</string>
+    <string name="more_description">更多</string>
+
+    <!-- 更多按钮功能相关 -->
+    <string name="more_options">更多选项</string>
+    <string name="settings">设置</string>
+    <string name="image">图片</string>
+    <string name="file">文件</string>
+    <string name="web_search">联网</string>
+
+    <!-- 设置相关 -->
+    <string name="custom_avatar">自定义头像</string>
+    <string name="user_avatar">用户头像</string>
+    <string name="ai_avatar">AI头像</string>
+    <string name="theme">色彩方案</string>
+    <string name="theme_light">浅色模式</string>
+    <string name="theme_dark">深色模式</string>
+    <string name="theme_system">跟随系统</string>
+    <string name="model">模型选择</string>
+    <string name="model_gpt4o_mini">gpt-4o-mini-ca (默认)</string>
+    <string name="model_gpt4o">gpt-4o-ca</string>
+    <string name="persona">人设</string>
+    <string name="persona_hint">请输入您希望AI扮演的角色</string>
+    <string name="save_settings">保存设置</string>
+
+    <!-- 用户个人主页相关字符串 -->
+    <string name="back_description">返回</string>
+    <string name="user_avatar_description">用户头像</string>
+    <string name="ai_avatar_description">AI头像</string>
+    <string name="edit_avatar_description">编辑头像</string>
+
+    <!-- 操作提示 -->
+    <string name="settings_saved">设置已保存</string>
+    <string name="web_search_enabled">已启用联网搜索功能</string>
+    <string name="web_search_disabled">已禁用联网搜索功能</string>
+</resources>

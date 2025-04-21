@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/momentCard"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardBackgroundColor="@color/card_background"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="4dp"
+    app:cardPreventCornerOverlap="false"
+    app:strokeColor="@color/divider"
+    app:strokeWidth="0.5dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
+
+        <!-- AI头像 - 缩小尺寸 -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/aiAvatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/CircleImageView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeColor="@color/divider"
+            app:strokeWidth="0.5dp"
+            android:elevation="2dp"
+            android:src="@drawable/default_ai_avatar" />
+
+        <!-- AI名称 - 调整字体大小 -->
+        <TextView
+            android:id="@+id/aiName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/primary"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-medium"
+            app:layout_constraintStart_toEndOf="@+id/aiAvatar"
+            app:layout_constraintTop_toTopOf="@+id/aiAvatar"
+            app:layout_constraintBottom_toBottomOf="@+id/aiAvatar"
+            tools:text="ChatGPT" />
+
+        <!-- 动态时间 - 减小字体 -->
+        <TextView
+            android:id="@+id/momentTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-light"
+            android:alpha="0.8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/aiAvatar"
+            app:layout_constraintBottom_toBottomOf="@+id/aiAvatar"
+            tools:text="2025-03-08 09:30" />
+
+        <!-- 动态标题 - 减小字体和间距 -->
+        <TextView
+            android:id="@+id/momentTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-medium"
+            android:layout_marginTop="14dp"
+            app:layout_constraintEnd_toStartOf="@+id/moreButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/aiAvatar"
+            tools:text="今日随想" />
+
+        <!-- 更多操作按钮 - 保持原样 -->
+        <ImageButton
+            android:id="@+id/moreButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="更多操作"
+            android:src="@drawable/ic_more"
+            android:tint="@color/text_secondary"
+            android:padding="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/momentTitle" />
+
+        <!-- 动态类型标签 - 减小尺寸 -->
+        <TextView
+            android:id="@+id/momentTypeTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/tag_background"
+            android:paddingStart="8dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="2dp"
+            android:textColor="@color/primary"
+            android:textSize="11sp"
+            android:fontFamily="sans-serif-medium"
+            android:elevation="2dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/momentTitle"
+            tools:text="AI生成"
+            tools:visibility="visible" />
+
+        <!-- 分隔线 - 减小间距 -->
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="0.5dp"
+            android:layout_marginTop="12dp"
+            android:background="@color/divider"
+            android:alpha="0.7"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/momentTypeTag"
+            tools:visibility="visible" />
+
+        <!-- 动态内容 - 减小间距和字体 -->
+        <TextView
+            android:id="@+id/momentContent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:ellipsize="end"
+            android:lineSpacingExtra="4dp"
+            android:maxLines="6"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-light"
+            android:alpha="0.95"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider"
+            tools:text="今天又是充实的一天。我学习了新知识，感觉很满足。每次交流都能带来新的视角。\n\n回顾今天，感到很满足，也期待明天的新对话。" />
+
+        <!-- 动态图片 - 减小间距并添加阴影 -->
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/momentImage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:adjustViewBounds="true"
+            android:contentDescription="动态图片"
+            android:maxHeight="180dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            android:elevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/momentContent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:shapeAppearanceOverlay="@style/RoundedCornerImageView"
+            app:strokeColor="@color/divider"
+            app:strokeWidth="0.5dp"
+            tools:src="@drawable/ic_empty_state"
+            tools:visibility="visible" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

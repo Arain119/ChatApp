@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/loadingIndicator"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/gpt_message_background"
+    android:elevation="0dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="12dp">
+
+    <TextView
+        android:id="@+id/dot1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="●"
+        android:textSize="10sp"
+        android:textColor="?attr/colorPrimary"
+        android:layout_marginEnd="4dp"/>
+
+    <TextView
+        android:id="@+id/dot2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="●"
+        android:textSize="10sp"
+        android:textColor="?attr/colorPrimary"
+        android:layout_marginEnd="4dp"/>
+
+    <TextView
+        android:id="@+id/dot3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="●"
+        android:textSize="10sp"
+        android:textColor="?attr/colorPrimary"/>
+
+</LinearLayout>

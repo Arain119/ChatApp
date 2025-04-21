@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/background">
+
+    <FrameLayout
+        android:id="@+id/settings_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- 设置项内容 -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/settings_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:scrollbars="none"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:clipToPadding="false">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="32dp">
+
+                <!-- 用户信息卡片 -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/card_background">
+
+                    <LinearLayout
+                        android:id="@+id/user_profile_item"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="16dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:background="@drawable/rounded_ripple_effect">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_user_avatar"
+                            android:background="@drawable/circle_primary_background"
+                            android:padding="8dp"
+                            android:tint="@color/text_white" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="16dp">
+
+                            <TextView
+                                android:id="@+id/username_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="个人主页"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="个人资料、账号设置等"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="14sp"
+                                android:layout_marginTop="2dp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_arrow_right"
+                            android:tint="@color/text_secondary" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- 第一组设置卡片 -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/card_background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <!-- 外观和主题 -->
+                        <LinearLayout
+                            android:id="@+id/appearance_item"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="16dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="@drawable/rounded_ripple_effect">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_theme"
+                                android:background="@drawable/circle_primary_background"
+                                android:padding="8dp"
+                                android:tint="@color/text_white" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="外观和主题"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:layout_marginStart="16dp" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_arrow_right"
+                                android:tint="@color/text_secondary" />
+                        </LinearLayout>
+
+                        <!-- 使用统一的分割线 -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/divider"
+                            android:layout_marginStart="56dp" />
+
+                        <!-- AI模型选择 -->
+                        <LinearLayout
+                            android:id="@+id/ai_model_item"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="16dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="@drawable/rounded_ripple_effect">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_assistant_avatar"
+                                android:background="@drawable/circle_primary_background"
+                                android:padding="8dp"
+                                android:tint="@color/text_white" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_marginStart="16dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="AI模型选择"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="16sp" />
+
+                                <TextView
+                                    android:id="@+id/model_value"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="gpt-4o-mini-ca"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="2dp"
+                                    android:visibility="gone"/>
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_arrow_right"
+                                android:tint="@color/text_secondary" />
+                        </LinearLayout>
+
+                        <!-- 使用统一的分割线 -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/divider"
+                            android:layout_marginStart="56dp" />
+
+                        <!-- 网络搜索 -->
+                        <LinearLayout
+                            android:id="@+id/web_search_item"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="16dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="@drawable/rounded_ripple_effect">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_network"
+                                android:background="@drawable/circle_primary_background"
+                                android:padding="8dp"
+                                android:tint="@color/text_white" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_marginStart="16dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="联网搜索"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="16sp" />
+
+                                <TextView
+                                    android:id="@+id/web_search_value"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="已禁用"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_arrow_right"
+                                android:tint="@color/text_secondary" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- 第二组设置卡片 -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/card_background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <!-- AI人设 -->
+                        <LinearLayout
+                            android:id="@+id/ai_persona_item"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="16dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="@drawable/rounded_ripple_effect">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_persona"
+                                android:background="@drawable/circle_primary_background"
+                                android:padding="8dp"
+                                android:tint="@color/text_white" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:layout_marginStart="16dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="AI人设"
+                                    android:textColor="@color/text_primary"
+                                    android:textSize="16sp" />
+
+                                <TextView
+                                    android:id="@+id/persona_value"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="未设置"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="14sp"
+                                    android:layout_marginTop="2dp" />
+                            </LinearLayout>
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_arrow_right"
+                                android:tint="@color/text_secondary" />
+                        </LinearLayout>
+
+                        <!-- 使用统一的分割线 -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/divider"
+                            android:layout_marginStart="56dp" />
+
+                        <!-- 聊天记录 -->
+                        <LinearLayout
+                            android:id="@+id/chat_history_item"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="16dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="@drawable/rounded_ripple_effect">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_history"
+                                android:background="@drawable/circle_primary_background"
+                                android:padding="8dp"
+                                android:tint="@color/text_white" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="聊天记录"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:layout_marginStart="16dp" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_arrow_right"
+                                android:tint="@color/text_secondary" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- 第三组设置卡片 -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="@color/card_background">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <!-- 关于 -->
+                        <LinearLayout
+                            android:id="@+id/about_item"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="16dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="@drawable/rounded_ripple_effect">
+
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/ic_info"
+                                android:background="@drawable/circle_primary_background"
+                                android:padding="8dp"
+                                android:tint="@color/text_white" />
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="关于"
+                                android:textColor="@color/text_primary"
+                                android:textSize="16sp"
+                                android:layout_marginStart="16dp" />
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_arrow_right"
+                                android:tint="@color/text_secondary" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </FrameLayout>
+</LinearLayout>

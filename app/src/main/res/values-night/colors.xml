@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 保持原有的主题色 -->
+    <color name="primary">#8cc260</color>
+    <color name="primary_dark">#55bb8a</color>
+    <color name="primary_light">#c6dfc8</color>
+    <color name="accent">#f28e16</color>
+    <color name="accent_light">#664B2900</color>
+
+    <!-- 深色模式文本颜色 -->
+    <color name="text_primary">#E6E6E6</color>
+    <color name="text_secondary">#ACACAC</color>
+    <color name="text_hint">#808080</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <color name="selected_card_background">#515360</color>
+
+    <!-- 深色模式背景颜色 -->
+    <color name="background">#343541</color>
+    <color name="surface">#2D2D3A</color>
+    <color name="divider">#4A4A4A</color>
+
+    <!-- 深色模式下的输入框背景 -->
+    <color name="input_background">#565869</color>
+
+    <!-- 深色模式卡片颜色 -->
+    <color name="card_background">#444654</color>
+    <color name="card_stroke">#555555</color>
+    <color name="chat_item_background">#424250</color>
+
+    <!-- 深色模式半透明背景 -->
+    <color name="background_semi_transparent">#CC343541</color>
+
+    <!-- 消息气泡颜色 -->
+    <color name="user_bubble">#9eccab</color>
+    <color name="ai_bubble">#444654</color>
+    <color name="bubble_border">#555555</color>
+
+    <!-- 添加其他可能在暗色模式下需要的颜色 -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="light_gray">#787878</color>
+    <color name="light_green">#90EE90</color>
+    <color name="surface_variant">#4E4E61</color>
+    <color name="selected_option">#3A476D</color>
+
+    <!-- 深色主题特定颜色 -->
+    <color name="dark_background">#343541</color>
+    <color name="dark_surface">#444654</color>
+    <color name="dark_user_bubble">#9eccab</color>
+    <color name="dark_ai_bubble">#444654</color>
+
+    <!-- 特殊状态颜色 -->
+    <color name="error">#f04b22</color>
+    <color name="success">#97C176</color>
+    <color name="warning">#FFF176</color>
+
+    <!-- 确保EditText使用的颜色在暗色模式下可见 -->
+    <color name="edit_text_color">#FFFFFF</color>
+
+    <!-- 切换按钮颜色 - 深色模式 -->
+    <color name="toggle_background">#3A3A3C</color>
+    <color name="toggle_selected">#6A8D6D</color>
+    <color name="toggle_text_color">#FFFFFF</color>
+    <color name="toggle_text_color_unselected">#B3B3B3</color>
+</resources>

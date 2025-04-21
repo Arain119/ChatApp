@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 基础颜色保持不变 -->
+    <color name="primary">#8cc260</color>
+    <color name="primary_dark">#55bb8a</color>
+    <color name="primary_light">#c6dfc8</color>
+    <color name="accent">#f28e16</color>
+    <color name="accent_light">#FFEBE4</color>
+    <!-- 主题颜色 -->
+    <color name="theme_green">#88BFB8</color>
+    <color name="theme_purple">#AD6598</color>
+    <color name="theme_orange">#EFAB84</color>
+    <color name="theme_pink">#F091A0</color>
+
+    <color name="dark_message_bubble">#2A2A2A</color>
+    <color name="light_message_bubble">#F5F5F5</color>
+    <color name="text_primary_dark">#E0E0E0</color>
+    <color name="text_primary_light">#202020</color>
+    <color name="text_disabled">#BBBBBB</color>
+
+    <color name="selected_card_background">#F5F7FF</color>
+
+    <!-- 主动消息设置页面颜色 -->
+    <color name="background_gradient_start">#F8F9FA</color>
+    <color name="background_gradient_end">#E8EAED</color>
+    <color name="info_card_background">#E8F4FD</color>
+    <color name="info_icon_tint">#4285F4</color>
+    <color name="info_text_color">#174EA6</color>
+    <color name="seekbar_track_background">#E0E0E0</color>
+
+    <!-- 文本颜色保持不变 -->
+    <color name="text_primary">#202123</color>
+    <color name="text_secondary">#6E6E80</color>
+    <color name="text_hint">#ACACBE</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- 背景颜色，确保卡片与背景有区别 -->
+    <color name="background">#F7F7F8</color>
+    <color name="surface">#F0F0F0</color>
+    <color name="divider">#E5E5E5</color>
+    <color name="chat_item_background">#F5F5F7</color>
+
+    <!-- 提示卡片禁用状态的颜色 -->
+    <color name="info_card_background_disabled">#1F2E2E2E</color>
+    <color name="info_text_color_disabled">#80757575</color>
+
+    <!-- 浅色模式下的输入框背景 -->
+    <color name="input_background">#F5F5F5</color>
+
+    <!-- 消息气泡颜色保持不变 -->
+    <color name="user_bubble">#66c18c</color>
+    <color name="ai_bubble">#CDDEEB</color>
+    <color name="bubble_border">#E5E5E5</color>
+    <color name="feedback_positive">#4CAF50</color>
+    <color name="feedback_negative">#F44336</color>
+
+    <!-- 特殊状态颜色保持不变 -->
+    <color name="error">#f04b22</color>
+    <color name="success">#769E58</color>
+    <color name="delete_red">#FF5252</color>
+    <color name="warning">#dbda41</color>
+
+    <!-- 深色主题专用颜色保持不变 -->
+    <color name="dark_background">#343541</color>
+    <color name="dark_surface">#444654</color>
+    <color name="dark_user_bubble">#9eccab</color>
+    <color name="dark_ai_bubble">#444654</color>
+
+    <!-- 系统颜色 -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="light_gray">#F7F7F8</color>
+    <color name="light_green">#90EE90</color>
+    <color name="surface_variant">#F0F0F0</color>
+    <color name="selected_option">#E3F2FD</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_stroke">#E0E0E0</color>
+    <color name="ripple_color">#22000000</color> <!-- 轻微的黑色透明度 -->
+    <color name="background_semi_transparent">#CCF7F7F8</color> <!-- 更新以匹配新背景 -->
+
+    <!-- 添加缺失的EditText颜色资源 -->
+    <color name="edit_text_color">#000000</color>
+    <color name="green_confirm">#4CAF50</color>
+
+    <!-- 切换按钮颜色 - 浅色模式 -->
+    <color name="toggle_background">#F2F2F7</color>
+    <color name="toggle_selected">#6A8D6D</color>
+    <color name="toggle_text_color">#FFFFFF</color>
+    <color name="toggle_text_color_unselected">#707070</color>
+</resources>

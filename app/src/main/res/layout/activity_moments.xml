@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fitsSystemWindows="true"
+    tools:context=".ui.MomentsActivity">
+
+    <!-- 顶部AppBar - 增强视觉效果 -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            app:title="动态"
+            app:titleTextAppearance="@style/ToolbarTitleText"
+            app:titleCentered="true" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- 顶部渐变阴影 -->
+    <View
+        android:id="@+id/topGradientMask"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:background="@drawable/top_gradient_mask"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:alpha="0.7" />
+
+    <!-- 内容区域 - 增强过渡动画支持 -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:transitionGroup="true"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <!-- 列表为空时显示 - 优化视觉风格 -->
+        <LinearLayout
+            android:id="@+id/emptyView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/emptyImage"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:contentDescription="空状态图标"
+                android:elevation="4dp"
+                android:src="@drawable/ic_empty_state" />
+
+            <TextView
+                android:id="@+id/emptyTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="暂无动态"
+                android:textColor="@color/text_primary"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:shadowColor="#40000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="1" />
+
+            <TextView
+                android:id="@+id/emptySubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="点击右下角的按钮添加动态"
+                android:textColor="@color/text_secondary"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <!-- 动态列表 - 优化滚动体验 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/momentsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="16dp"
+            android:paddingBottom="88dp"
+            android:overScrollMode="never"
+            android:transitionName="moments_list"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbars="vertical"
+            android:fadingEdgeLength="16dp"
+            android:requiresFadingEdge="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/item_moment_card" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- 添加动态按钮 - 增强视觉效果 -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addMomentFab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        android:contentDescription="添加动态"
+        android:src="@drawable/ic_add"
+        app:backgroundTint="?attr/colorPrimary"
+        app:rippleColor="?attr/colorPrimary"
+        app:fabSize="normal"
+        app:tint="@color/text_white"
+        app:elevation="10dp"
+        app:pressedTranslationZ="14dp"
+        app:maxImageSize="26dp"
+        app:borderWidth="0dp"
+        app:shapeAppearance="@style/SuperEllipseShapeAppearance" />
+
+    <!-- 底部渐变阴影 - 增强视觉层次 -->
+    <View
+        android:id="@+id/bottomGradientMask"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:background="@drawable/bottom_gradient_mask"
+        android:layout_gravity="bottom"
+        android:alpha="0.85" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

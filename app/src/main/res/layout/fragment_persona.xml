@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="never">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- 标题 -->
+        <TextView
+            android:id="@+id/persona_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="AI人设"
+            android:textColor="@color/text_primary"
+            android:textSize="32sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold"
+            android:layout_marginTop="26dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginBottom="26dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- AI姓名设置卡片 -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/nameCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginHorizontal="2dp"
+            app:cardBackgroundColor="@color/card_background"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="3dp"
+            app:layout_constraintTop_toBottomOf="@id/persona_title"
+            app:strokeWidth="0.5dp"
+            app:strokeColor="@color/divider">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="24dp">
+
+                <!-- 图标容器 - 背景改为透明 -->
+                <FrameLayout
+                    android:id="@+id/nameIconContainer"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@android:color/transparent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/nameIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_person"
+                        app:tint="?attr/colorPrimary" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/nameLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AI姓名"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintStart_toEndOf="@id/nameIconContainer"
+                    app:layout_constraintTop_toTopOf="@id/nameIconContainer"
+                    app:layout_constraintBottom_toBottomOf="@id/nameIconContainer" />
+
+                <TextView
+                    android:id="@+id/nameDescription"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="为您的AI助手取一个名字"
+                    android:textColor="@color/text_secondary"
+                    android:fontFamily="sans-serif-light"
+                    android:alpha="0.9"
+                    android:textSize="15sp"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/nameIconContainer"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <!-- 修改后的AI姓名输入框 -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/nameInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@null"
+                    app:boxBackgroundColor="@color/input_background"
+                    app:boxBackgroundMode="filled"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:hintEnabled="false"
+                    app:layout_constraintTop_toBottomOf="@id/nameDescription">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/ai_name_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:hint="例如：ChatGPT, Claude, Gemini..."
+                        android:inputType="text"
+                        android:maxLength="20"
+                        android:padding="16dp"
+                        android:singleLine="true"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_hint"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 人设卡片 -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/personaCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="2dp"
+            app:cardBackgroundColor="@color/card_background"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="3dp"
+            app:layout_constraintTop_toBottomOf="@id/nameCard"
+            app:strokeWidth="0.5dp"
+            app:strokeColor="@color/divider">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="24dp">
+
+                <!-- 图标容器 - 背景改为透明 -->
+                <FrameLayout
+                    android:id="@+id/personaIconContainer"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@android:color/transparent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/personaIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_settings"
+                        app:tint="?attr/colorPrimary" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/personaLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="角色与性格"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:layout_marginStart="16dp"
+                    app:layout_constraintStart_toEndOf="@id/personaIconContainer"
+                    app:layout_constraintTop_toTopOf="@id/personaIconContainer"
+                    app:layout_constraintBottom_toBottomOf="@id/personaIconContainer" />
+
+                <TextView
+                    android:id="@+id/personaDescription"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="定制AI的回复风格、知识领域和行为方式"
+                    android:textColor="@color/text_secondary"
+                    android:fontFamily="sans-serif-light"
+                    android:alpha="0.9"
+                    android:textSize="15sp"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintTop_toBottomOf="@id/personaIconContainer"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <!-- 修改后的人设输入框 -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/personaInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@null"
+                    app:boxBackgroundColor="@color/input_background"
+                    app:boxBackgroundMode="filled"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:hintEnabled="false"
+                    app:layout_constraintTop_toBottomOf="@id/personaDescription">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/persona_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:gravity="top"
+                        android:hint="例如：你是一位专业的心理咨询师，擅长倾听和分析问题，总是以温和的语气回应..."
+                        android:inputType="textMultiLine"
+                        android:minLines="8"
+                        android:padding="16dp"
+                        android:scrollbars="vertical"
+                        android:textColor="@color/text_primary"
+                        android:textColorHint="@color/text_hint"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 提示卡片 -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tipsCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="2dp"
+            app:cardBackgroundColor="@color/card_background"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="2dp"
+            app:layout_constraintTop_toBottomOf="@id/personaCard"
+            app:strokeWidth="0.5dp"
+            app:strokeColor="@color/divider">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="20dp">
+
+                <FrameLayout
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@android:color/transparent">
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_info"
+                        app:tint="?attr/colorPrimary" />
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="设置人设会影响AI的回复风格、语气和专业领域，让对话更加个性化和专业化。"
+                    android:textColor="@color/text_primary"
+                    android:alpha="0.8"
+                    android:fontFamily="sans-serif-light"
+                    android:textSize="15sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 保存按钮 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/save_button"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="32dp"
+            android:backgroundTint="?attr/colorPrimary"
+            android:text="保存设置"
+            android:textColor="@color/text_white"
+            android:textSize="17sp"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0.01"
+            app:cornerRadius="16dp"
+            app:elevation="4dp"
+            app:layout_constraintTop_toBottomOf="@id/tipsCard"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            android:layout_marginBottom="16dp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

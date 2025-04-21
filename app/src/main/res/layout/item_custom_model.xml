@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="20dp"
+    android:gravity="center_vertical"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="@drawable/model_selector_background"
+    android:foreground="?attr/selectableItemBackground">
+
+    <ImageView
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/ic_assistant_avatar"
+        android:layout_marginEnd="16dp"
+        android:tint="?attr/colorPrimary"
+        android:padding="6dp"
+        android:background="@drawable/circle_background_light" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/model_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Custom Model"
+            android:textColor="@color/text_primary"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="自定义模型"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/custom_model_check"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@drawable/ic_check"
+        android:tint="?attr/colorPrimary"
+        android:visibility="gone" />
+</LinearLayout>

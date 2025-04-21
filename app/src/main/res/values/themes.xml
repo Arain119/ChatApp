@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 基础应用主题 -->
+    <style name="Theme.ChatApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- 主要颜色 -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+
+        <!-- 状态栏和导航栏定制 -->
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <!-- 文本颜色 -->
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+
+        <!-- 背景颜色 -->
+        <item name="android:windowBackground">@color/background</item>
+
+        <!-- 波纹效果 -->
+        <item name="colorControlHighlight">#40000000</item>
+
+        <!-- 工具栏样式 -->
+        <item name="toolbarStyle">@style/Widget.ChatApp.Toolbar</item>
+
+        <!-- 应用菜单样式 -->
+        <item name="android:popupMenuStyle">@style/PopupMenuStyle</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/PopupMenuItemStyle</item>
+        <item name="android:textAppearanceSmallPopupMenu">@style/PopupMenuItemStyle</item>
+
+        <!-- 全局禁用阴影 -->
+        <item name="android:elevation">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:outlineProvider">none</item>
+
+        <!-- Material组件扁平化 -->
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="materialCardViewStyle">@style/Widget.ChatApp.CardView.Flat</item>
+
+        <!-- 禁用手势导航的关键属性 -->
+        <item name="android:windowSwipeToDismiss">false</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:navigationBarColor">@color/background</item>
+
+        <!-- 处理边缘滑动手势 -->
+        <item name="android:windowLayoutInDisplayCutoutMode">default</item>
+        <item name="android:windowEnableSplitTouch">false</item>
+
+        <!-- 防止内容延伸到导航栏区域 -->
+        <item name="android:enforceNavigationBarContrast">false</item>
+
+        <!-- 明确设置输入模式，处理键盘与导航的交互 -->
+        <item name="android:windowSoftInputMode">adjustResize|stateAlwaysHidden</item>
+    </style>
+
+    <!-- 绿色主题 -->
+    <style name="Theme.ChatApp.Green" parent="Theme.ChatApp">
+        <item name="colorPrimary">@color/theme_green</item>
+        <item name="colorPrimaryDark">@color/theme_green</item>
+        <item name="colorAccent">@color/theme_green</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">?attr/colorPrimary</item>
+    </style>
+
+    <!-- 紫色主题 -->
+    <style name="Theme.ChatApp.Purple" parent="Theme.ChatApp">
+        <item name="colorPrimary">@color/theme_purple</item>
+        <item name="colorPrimaryDark">@color/theme_purple</item>
+        <item name="colorAccent">@color/theme_purple</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">?attr/colorPrimary</item>
+    </style>
+
+    <!-- 橙色主题 -->
+    <style name="Theme.ChatApp.Orange" parent="Theme.ChatApp">
+        <item name="colorPrimary">@color/theme_orange</item>
+        <item name="colorPrimaryDark">@color/theme_orange</item>
+        <item name="colorAccent">@color/theme_orange</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">?attr/colorPrimary</item>
+    </style>
+
+    <!-- 粉色主题 -->
+    <style name="Theme.ChatApp.Pink" parent="Theme.ChatApp">
+        <item name="colorPrimary">@color/theme_pink</item>
+        <item name="colorPrimaryDark">@color/theme_pink</item>
+        <item name="colorAccent">@color/theme_pink</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">?attr/colorPrimary</item>
+    </style>
+
+    <!-- 菜单样式 - 移到外层 -->
+    <style name="PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/popup_menu_background</item>
+        <item name="android:popupElevation">4dp</item>
+    </style>
+
+    <style name="TimeRangeToggleButtonStyle" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="android:minWidth">60dp</item>
+        <item name="android:minHeight">36dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+    </style>
+
+    <style name="Theme.ChatApp.FullScreen" parent="Theme.ChatApp">
+        <!-- 隐藏状态栏 -->
+        <item name="android:windowFullscreen">true</item>
+        <!-- 移除窗口内容覆盖 -->
+        <item name="android:windowContentOverlay">@null</item>
+        <!-- 状态栏和导航栏透明 -->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <!-- 窗口背景透明 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!-- 不允许内容延伸到系统栏区域 -->
+        <item name="android:fitsSystemWindows">false</item>
+        <!-- 状态栏颜色透明 -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- 强制深色图标 -->
+        <item name="android:windowLightStatusBar">false</item>
+        <!-- 禁用滑动手势 -->
+        <item name="android:windowSwipeToDismiss">false</item>
+    </style>
+
+    <style name="AppTheme.UCrop" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">?attr/colorPrimary</item>
+        <item name="colorPrimaryDark">?attr/colorPrimaryDark</item>
+        <item name="colorAccent">?attr/colorPrimary</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:fitsSystemWindows">false</item>
+    </style>
+
+    <!-- 菜单项样式 -->
+    <style name="PopupMenuItemStyle" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+    </style>
+
+    <!-- 弹出覆盖样式 - 移到外层 -->
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:popupMenuStyle">@style/PopupMenuStyle</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/PopupMenuItemStyle</item>
+        <item name="android:textAppearanceSmallPopupMenu">@style/PopupMenuItemStyle</item>
+    </style>
+
+    <style name="DialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+        <item name="materialButtonStyle">@style/DialogButtonStyle</item>
+    </style>
+
+    <style name="DialogButtonStyle" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:minWidth">64dp</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <!-- 扁平卡片样式 -->
+    <style name="Widget.ChatApp.CardView.Flat" parent="Widget.MaterialComponents.CardView">
+        <item name="cardElevation">0dp</item>
+        <item name="cardPreventCornerOverlap">false</item>
+    </style>
+
+    <!-- 工具栏样式 -->
+    <style name="Widget.ChatApp.Toolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">@color/background</item>
+        <item name="android:elevation">0dp</item>
+        <item name="elevation">0dp</item>
+        <item name="titleTextAppearance">@style/ToolbarTitleText</item>
+    </style>
+
+    <style name="ToolbarTitleText" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="Theme.ChatApp.Dialog" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="colorPrimary">?attr/colorPrimary</item>
+        <item name="colorAccent">?attr/colorAccent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+    </style>
+
+    <!-- 对话框按钮样式 -->
+    <style name="ThemeOverlay.App.MaterialAlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/Widget.App.Button</item>
+        <item name="buttonBarNegativeButtonStyle">@style/Widget.App.Button</item>
+    </style>
+
+    <style name="Widget.App.Button" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="rippleColor">@color/primary_light</item>
+    </style>
+
+    <style name="Widget.ChatApp.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="boxBackgroundColor">@color/surface</item>
+        <item name="boxCornerRadiusBottomEnd">28dp</item>
+        <item name="boxCornerRadiusBottomStart">28dp</item>
+        <item name="boxCornerRadiusTopEnd">28dp</item>
+        <item name="boxCornerRadiusTopStart">28dp</item>
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+        <item name="boxStrokeColor">@android:color/transparent</item>
+        <item name="hintTextColor">@color/text_hint</item>
+        <item name="android:elevation">0dp</item>
+        <item name="elevation">0dp</item>
+    </style>
+
+    <!-- 其余样式 -->
+    <style name="Widget.ChatApp.SendButton" parent="Widget.MaterialComponents.Button">
+        <item name="android:background">@drawable/send_button_background</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:elevation">0dp</item>
+        <item name="elevation">0dp</item>
+    </style>
+
+    <style name="Widget.ChatApp.CircleButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="android:layout_width">42dp</item>
+        <item name="android:layout_height">42dp</item>
+        <item name="android:padding">9dp</item>
+        <item name="android:scaleType">fitCenter</item>
+    </style>
+
+    <style name="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:elevation">0dp</item>
+        <item name="behavior_hideable">false</item>
+        <item name="behavior_skipCollapsed">true</item>
+        <item name="behavior_draggable">false</item>
+    </style>
+
+    <style name="SuperEllipseShapeAppearance">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+        <item name="cornerFamilyTopLeft">rounded</item>
+        <item name="cornerFamilyTopRight">rounded</item>
+        <item name="cornerFamilyBottomLeft">rounded</item>
+        <item name="cornerFamilyBottomRight">rounded</item>
+        <item name="cornerSizeTopLeft">20dp</item>
+        <item name="cornerSizeTopRight">20dp</item>
+        <item name="cornerSizeBottomLeft">20dp</item>
+        <item name="cornerSizeBottomRight">20dp</item>
+    </style>
+
+    <style name="RoundedCornerImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="ShapeAppearanceBottomSheet" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="Theme.ChatApp.NoActionBar" parent="Theme.ChatApp">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+    <style name="Theme.ChatApp.Fullscreen" parent="Theme.ChatApp">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowBackground">?attr/colorPrimary</item>
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">default</item>
+        <item name="android:windowSwipeToDismiss">false</item>
+    </style>
+
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/dialog_fade_in</item>
+        <item name="android:windowExitAnimation">@anim/dialog_fade_out</item>
+    </style>
+
+    <!-- 新增：对话框滑入滑出动画 -->
+    <style name="DialogAnimationSlideUp">
+        <item name="android:windowEnterAnimation">@anim/dialog_slide_up</item>
+        <item name="android:windowExitAnimation">@anim/dialog_slide_down</item>
+    </style>
+
+    <style name="AppBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <!-- 透明圆角底部表单样式 -->
+    <style name="TransparentBottomSheetDialog" parent="Theme.MaterialComponents.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+        <item name="bottomSheetStyle">@style/TransparentBottomSheet</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.5</item>
+        <!-- 设置窗口背景透明 -->
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="TransparentBottomSheet" parent="Widget.MaterialComponents.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:elevation">0dp</item>
+        <item name="elevation">0dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceBottomSheetDialog</item>
+        <item name="behavior_draggable">false</item>
+        <item name="behavior_skipCollapsed">true</item>
+    </style>
+
+    <style name="ShapeAppearanceBottomSheetDialog" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+    </style>
+
+    <style name="RoundedBottomSheetDialog" parent="Theme.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/RoundedBottomSheet</item>
+    </style>
+
+    <style name="RoundedBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/RoundedShapeAppearance</item>
+        <item name="behavior_draggable">false</item>
+        <item name="behavior_skipCollapsed">true</item>
+    </style>
+
+    <style name="RoundedShapeAppearance" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+    </style>
+
+    <style name="CustomShapeAppearanceBottomSheetDialog" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+    </style>
+
+    <style name="BottomSheetAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
+    </style>
+
+    <style name="Theme.ChatApp.BottomSheetDialog" parent="Theme.MaterialComponents.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget.ChatApp.BottomSheet</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <style name="Widget.ChatApp.BottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.ChatApp.LargeComponent</item>
+        <item name="backgroundTint">@color/background</item>
+        <item name="behavior_peekHeight">480dp</item>
+        <item name="behavior_draggable">false</item>
+        <item name="behavior_fitToContents">true</item>
+    </style>
+
+    <style name="ShapeAppearance.ChatApp.LargeComponent" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">0dp</item>
+        <item name="cornerSizeBottomRight">0dp</item>
+    </style>
+
+    <style name="Widget.ChatApp.Button.Text" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="rippleColor">@color/ripple_color</item>
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <style name="Widget.ChatApp.Button.Primary" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="android:textColor">@color/text_white</item>
+        <item name="cornerRadius">20dp</item>
+    </style>
+
+    <style name="CustomBottomSheetDialog" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
+    </style>
+
+    <style name="CustomBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="android:background">@drawable/bottom_sheet_background</item>
+        <item name="behavior_draggable">false</item>
+        <item name="behavior_skipCollapsed">true</item>
+    </style>
+
+    <style name="RoundedImageView" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="CircleImageView">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- 新增：透明对话框样式 -->
+    <style name="ThemeOverlay.App.TransparentDialog" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowMinWidthMajor">0dp</item>
+        <item name="android:windowMinWidthMinor">0dp</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/TextAppearance.App.DialogTitle</item>
+    </style>
+
+    <!-- 新增：对话框标题文字样式 -->
+    <style name="TextAppearance.App.DialogTitle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- 警告对话框主题 -->
+    <style name="AlertDialogTheme" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="colorPrimary">?attr/colorPrimary</item>
+        <item name="colorSurface">@color/background</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:background">@color/background</item>
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowMinWidthMajor">80%</item>
+        <item name="android:windowMinWidthMinor">80%</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/text_secondary</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/delete_red</item>
+    </style>
+</resources>

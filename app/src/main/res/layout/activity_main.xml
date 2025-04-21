@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".MainActivity">
+
+    <!-- 聊天内容区域 - 调整内边距使更符合设计风格 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingTop="84dp"
+        android:paddingBottom="88dp"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:listitem="@layout/item_message_user" />
+
+    <!-- 顶部渐变遮罩 - 使用更柔和的渐变 -->
+    <View
+        android:id="@+id/topGradientMask"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:background="@drawable/top_gradient_mask"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 顶部 AppBar - 优化为关于页面风格 -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:elevation="0dp"
+        app:elevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:contentInsetStart="0dp"
+            android:elevation="0dp"
+            android:paddingHorizontal="16dp"
+            android:background="@android:color/transparent"
+            app:contentInsetStartWithNavigation="0dp"
+            app:elevation="0dp"
+            app:title="Alice"
+            app:titleTextColor="@color/text_primary"
+            app:titleTextAppearance="@style/ToolbarTitleText" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- 底部渐变遮罩 - 使用更柔和的渐变 -->
+    <View
+        android:id="@+id/bottomGradientMask"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:background="@drawable/bottom_gradient_mask"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- 底部输入区 - 使用卡片设计提升视觉层次感，兼容深色模式 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/bottomInputContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@color/card_background"
+        app:strokeColor="@color/divider"
+        app:strokeWidth="0.5dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="8dp">
+
+            <!-- 更多按钮 - 移除涟漪效果 -->
+            <ImageButton
+                android:id="@+id/moreButton"
+                style="@style/Widget.ChatApp.CircleButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/more_description"
+                android:padding="9dp"
+                android:src="@drawable/ic_more"
+                app:tint="@color/text_secondary"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- 输入框 - 简化设计，移除多余边框 -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/textInputLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:hint="@string/message_hint"
+                android:background="@null"
+                app:boxBackgroundColor="@android:color/transparent"
+                app:boxStrokeWidth="0dp"
+                app:boxStrokeWidthFocused="0dp"
+                app:hintEnabled="true"
+                app:hintAnimationEnabled="true"
+                app:hintTextColor="@color/text_hint"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/sendButton"
+                app:layout_constraintStart_toEndOf="@id/moreButton"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <!-- 输入框文本框 - 放大文字大小 -->
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/input_field_background"
+                    android:fontFamily="sans-serif"
+                    android:inputType="textMultiLine"
+                    android:maxLines="4"
+                    android:padding="12dp"
+                    android:textColor="@color/text_primary"
+                    android:textSize="18sp"
+                    android:textColorHint="@color/text_hint" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- 发送按钮 - 深色模式兼容 -->
+            <ImageButton
+                android:id="@+id/sendButton"
+                style="@style/Widget.ChatApp.CircleButton"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:background="@drawable/send_button_background"
+                android:contentDescription="@string/send_description"
+                android:padding="9dp"
+                android:src="@drawable/ic_send"
+                app:tint="@color/text_white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 全屏加载指示器 - 优化设计风格，深色模式兼容 -->
+    <FrameLayout
+        android:id="@+id/fullscreenLoading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="gone"
+        android:alpha="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="@color/card_background">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <ProgressBar
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="16dp"
+                    android:indeterminateTint="?attr/colorPrimary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="加载消息中..."
+                    android:textColor="@color/text_primary"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
