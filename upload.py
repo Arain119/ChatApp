@@ -6,7 +6,7 @@ import sys
 # 本地仓库路径 (请确保路径正确)
 repo_path = r"D:\linqianxia\ChatApp"
 # GitHub 仓库 URL (请替换成你的仓库地址)
-remote_url = "https://github.com/Arain119/ChatApp.git"
+remote_url = "https://github.com/Arain119/ChatApp"
 # 提交信息
 commit_message = "Initial upload via Python script"
 # 默认分支名 (GitHub 现在通常是 main)
