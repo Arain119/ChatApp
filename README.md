@@ -1,7 +1,7 @@
 # ChatApp - 不只是 AI，更是懂你的伙伴 ❤️ 
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![构建状态](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]() [![Latest Release](https://img.shields.io/github/v/release/Arain119/ChatApp?include_prereleases)]([https://github.com/Arain119/ChatApp/releases](https://github.com/Arain119/ChatApp/releases/tag/Android))
+[![构建状态](https://img.shields.io/badge/Build-Passing-brightgreen.svg)]() [![Latest Release](https://img.shields.io/github/v/release/Arain119/ChatApp?include_prereleases)](https://github.com/Arain119/ChatApp/releases)
 [![贡献欢迎](https://img.shields.io/badge/Contributions-Welcome-orange.svg)]()
 
 ---
