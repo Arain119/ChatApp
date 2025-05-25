@@ -68,7 +68,8 @@ import com.example.chatapp.data.MessagePagingManager
 import com.example.chatapp.data.MessageType
 import com.example.chatapp.data.SettingsManager
 import com.example.chatapp.service.AlarmIntentAnalyzer
-import com.example.chatapp.service.AlarmManager
+// 由于 AlarmManager 类名与系统类冲突，这里使用全限定名
+// import com.example.chatapp.service.AlarmManager
 import com.example.chatapp.ui.ChatHistoryFragment
 import com.example.chatapp.ui.DocumentViewerActivity
 import com.example.chatapp.ui.ImageViewerActivity
@@ -136,7 +137,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
     private var geocodedAddressCache: String? = null
 
     // 闹钟管理器
-    private lateinit var alarmManager: AlarmManager
+    private lateinit var alarmManagerService: com.example.chatapp.service.AlarmManager // 使用全限定名以避免与系统类冲突
     private lateinit var alarmIntentAnalyzer: AlarmIntentAnalyzer
 
     // 标题栏长按处理相关
@@ -210,7 +211,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         viewModel = ViewModelProvider(this)[ChatViewModel::class.java]
 
         // 初始化闹钟管理器
-        alarmManager = AlarmManager(applicationContext)
+        alarmManagerService = com.example.chatapp.service.AlarmManager(applicationContext) // 使用全限定名
 
         // 初始化闹钟意图分析器
         alarmIntentAnalyzer = AlarmIntentAnalyzer()
@@ -275,7 +276,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         checkNotificationPermission()
 
         // 检查精确闹钟权限
-        alarmManager.checkExactAlarmPermission(this)
+        alarmManagerService.checkExactAlarmPermission(this) // 使用全限定名
     }
 
     /**
@@ -497,7 +498,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
             val btnSend = dialogView.findViewById<Button>(R.id.btnSend)
 
             // 圆角尺寸
-            val cornerRadius = resources.getDimensionPixelSize(R.dimen.corner_radius)
+            val cornerRadius = resources.getDimensionPixelSize(R.dimen.corner_radius) //
 
             // 使用标准的Glide RoundedCorners变换，并正确设置变换顺序
             Glide.with(this)
@@ -506,18 +507,18 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                 .into(imagePreview)
 
             // 应用圆角背景到整个对话框
-            dialogView.setBackgroundResource(R.drawable.rounded_content_background)
+            dialogView.setBackgroundResource(R.drawable.rounded_content_background) //
 
             // 设置按钮圆角背景
-            btnSend.setBackgroundResource(R.drawable.rounded_button_background)
-            btnCancel.setBackgroundResource(R.drawable.rounded_white_button_background)
+            btnSend.setBackgroundResource(R.drawable.rounded_button_background) //
+            btnCancel.setBackgroundResource(R.drawable.rounded_white_button_background) //
 
             // 设置按钮文字颜色
             btnSend.setTextColor(ContextCompat.getColor(this, R.color.white))
             btnCancel.setTextColor(ContextCompat.getColor(this, R.color.text_primary))
 
             // 设置按钮内边距
-            val padding = resources.getDimensionPixelSize(R.dimen.button_padding)
+            val padding = resources.getDimensionPixelSize(R.dimen.button_padding) //
             btnSend.setPadding(padding, padding, padding, padding)
             btnCancel.setPadding(padding, padding, padding, padding)
 
@@ -527,7 +528,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                     MotionEvent.ACTION_DOWN -> {
                         // 按下时立即执行动画和触觉反馈
                         startButtonPressAnimation(view as Button)
-                        HapticUtils.performHapticFeedback(this@MainActivity, false)
+                        HapticUtils.performHapticFeedback(this@MainActivity, false) //
                         true
                     }
                     MotionEvent.ACTION_UP -> {
@@ -565,7 +566,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                     MotionEvent.ACTION_DOWN -> {
                         // 按下时立即执行动画和轻微触觉反馈
                         startButtonPressAnimation(view as Button)
-                        HapticUtils.performHapticFeedback(this@MainActivity, false)
+                        HapticUtils.performHapticFeedback(this@MainActivity, false) //
                         true
                     }
                     MotionEvent.ACTION_UP -> {
@@ -721,11 +722,11 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                 loadingView?.visibility = View.VISIBLE
 
                 // 震动反馈
-                HapticUtils.performHapticFeedback(this@MainActivity, true)
+                HapticUtils.performHapticFeedback(this@MainActivity, true) //
 
                 // 获取文件名，用于显示提示
-                val documentProcessor = DocumentProcessor(this@MainActivity)
-                val fileName = documentProcessor.getFileName(fileUri)
+                val documentProcessor = DocumentProcessor(this@MainActivity) //
+                val fileName = documentProcessor.getFileName(fileUri) //
 
                 // 显示处理提示
                 Toast.makeText(this@MainActivity, "正在处理文档: $fileName...", Toast.LENGTH_SHORT).show()
@@ -742,7 +743,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                 Log.e(TAG, "处理文档失败: ${e.message}", e)
 
                 // 错误震动反馈
-                HapticUtils.performHapticFeedback(this@MainActivity, true)
+                HapticUtils.performHapticFeedback(this@MainActivity, true) //
 
                 // 显示错误信息
                 Toast.makeText(this@MainActivity, "文档处理失败: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -872,7 +873,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         // 初始化闹钟管理器
         lifecycleScope.launch {
             try {
-                alarmManager.rescheduleAllActiveAlarms()
+                alarmManagerService.rescheduleAllActiveAlarms() // 使用全限定名
                 Log.d("MainActivity", "闹钟已重新调度")
             } catch (e: Exception) {
                 Log.e("MainActivity", "重新调度闹钟失败: ${e.message}", e)
@@ -1331,7 +1332,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                     startTitlePressAnimation(titleTextView)
 
                     // 提供即时触觉反馈
-                    HapticUtils.performHapticFeedback(this@MainActivity, false)
+                    HapticUtils.performHapticFeedback(this@MainActivity, false) //
                     true
                 }
                 MotionEvent.ACTION_UP -> {
@@ -1454,7 +1455,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         isTitleAnimating = true
 
         // 震动反馈
-        HapticUtils.performHapticFeedback(applicationContext, true)
+        HapticUtils.performHapticFeedback(applicationContext, true) //
 
         // 获取根视图
         val rootView = findViewById<View>(R.id.main)
@@ -1536,13 +1537,13 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
 
     private fun setupSendButton() {
         // 加载发送动画
-        val sendAnimation = AnimationUtils.loadAnimation(this, R.anim.send_button_animation)
+        val sendAnimation = AnimationUtils.loadAnimation(this, R.anim.send_button_animation) //
 
         sendButton.setOnClickListener {
             val message = inputEditText.text.toString().trim()
             if (message.isNotEmpty()) {
                 // 添加震动反馈
-                HapticUtils.performViewHapticFeedback(sendButton)
+                HapticUtils.performViewHapticFeedback(sendButton) //
 
                 // 播放发送按钮动画
                 sendButton.startAnimation(sendAnimation)
@@ -1672,7 +1673,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
     private suspend fun analyzeAndSetAlarmIfNeeded(message: String): Pair<Boolean, String> {
         return try {
             // 直接使用AlarmManager的公共方法
-            alarmManager.analyzeAndSetAlarm(message)
+            alarmManagerService.analyzeAndSetAlarm(message) // 使用全限定名
         } catch (e: Exception) {
             Log.e("MainActivity", "闹钟操作失败: ${e.message}", e)
             Pair(false, "")
@@ -1746,7 +1747,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                     // 按下时立即执行动画
                     startMoreButtonPressAnimation()
                     // 提供即时的触觉反馈
-                    HapticUtils.performHapticFeedback(this@MainActivity, false)
+                    HapticUtils.performHapticFeedback(this@MainActivity, false) //
                     true
                 }
                 MotionEvent.ACTION_UP -> {
@@ -1757,9 +1758,17 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                     if (isInBounds) {
                         // 执行释放动画（带回弹效果）
                         startMoreButtonReleaseAnimation {
-                            // 动画完成后显示底部表单
+                            // ** BUG修复点：动画完成后，先隐藏键盘，再显示底部表单 **
+                            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                            imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+
+                            // 可以选择性地在此处添加一个非常短的延迟（例如50-100毫秒），
+                            // 以确保键盘完全隐藏后再显示底部表单，但这通常不是必需的，
+                            // 因为隐藏键盘的操作是相对即时的。
+                            // Handler(Looper.getMainLooper()).postDelayed({
                             val bottomSheet = MoreOptionsBottomSheet()
                             bottomSheet.show(supportFragmentManager, "MoreOptionsBottomSheet")
+                            // }, 50)
                         }
                     } else {
                         // 如果手指在按钮区域外抬起，只执行释放动画
@@ -1776,6 +1785,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
             }
         }
     }
+
 
     /**
      * 执行更多按钮按下动画
@@ -1877,19 +1887,28 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
 
         val animSequence = AnimatorSet()
         animSequence.playSequentially(scaleDown, scaleUp)
-        animSequence.start()
 
-        // 动画完成后显示底部表单
+
+        // ** BUG修复点：动画完成后，先隐藏键盘，再显示底部表单 **
         animSequence.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
                 // 震动反馈
-                HapticUtils.performHapticFeedback(this@MainActivity)
+                HapticUtils.performHapticFeedback(this@MainActivity) //
 
+                // 隐藏键盘
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(inputEditText.windowToken, 0)
+
+                // 显示底部表单
+                // Handler(Looper.getMainLooper()).postDelayed({ // 可选的延迟
                 val bottomSheet = MoreOptionsBottomSheet()
                 bottomSheet.show(supportFragmentManager, "MoreOptionsBottomSheet")
+                // }, 50)
             }
         })
+        animSequence.start()
     }
+
 
     private fun observeMessages() {
         lifecycleScope.launch {
@@ -1974,7 +1993,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
             startActivity(intent)
 
             // 添加过渡动画
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out) //
         } catch (e: Exception) {
             Log.e(TAG, "打开图片查看器失败: ${e.message}", e)
             Toast.makeText(this, "无法打开图片查看器", Toast.LENGTH_SHORT).show()
@@ -2053,7 +2072,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
             // 设置窗口背景为透明
             bottomSheetDialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
-            val dialogView = layoutInflater.inflate(R.layout.dialog_delete_confirmation, null)
+            val dialogView = layoutInflater.inflate(R.layout.dialog_delete_confirmation, null) //
 
             // 初始化按钮
             val btnCancel = dialogView.findViewById<Button>(R.id.btnCancel)
@@ -2065,7 +2084,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                     MotionEvent.ACTION_DOWN -> {
                         // 按下时立即执行动画和触觉反馈
                         startButtonPressAnimation(view as Button)
-                        HapticUtils.performHapticFeedback(this@MainActivity, true)
+                        HapticUtils.performHapticFeedback(this@MainActivity, true) //
                         true
                     }
                     MotionEvent.ACTION_UP -> {
@@ -2100,7 +2119,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                     MotionEvent.ACTION_DOWN -> {
                         // 按下时立即执行动画和轻微触觉反馈
                         startButtonPressAnimation(view as Button)
-                        HapticUtils.performHapticFeedback(this@MainActivity, false)
+                        HapticUtils.performHapticFeedback(this@MainActivity, false) //
                         true
                     }
                     MotionEvent.ACTION_UP -> {
@@ -2231,7 +2250,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         Toast.makeText(this, "正在重新生成回复...", Toast.LENGTH_SHORT).show()
 
         // 添加震动反馈
-        HapticUtils.performHapticFeedback(this, true)
+        HapticUtils.performHapticFeedback(this, true) //
 
         lifecycleScope.launch {
             try {
@@ -2297,7 +2316,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         imm.showSoftInput(inputEditText, InputMethodManager.SHOW_IMPLICIT)
 
         // 添加震动反馈
-        HapticUtils.performHapticFeedback(this)
+        HapticUtils.performHapticFeedback(this) //
 
         // 显示取消编辑提示
         showCancelEditSnackbar()
@@ -2340,7 +2359,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
 
             // 解码Base64图片并显示 - 现在我们确定imageData不为空
             val imageBytes = android.util.Base64.decode(imageData, android.util.Base64.DEFAULT)
-            val cornerRadius = resources.getDimensionPixelSize(R.dimen.corner_radius)
+            val cornerRadius = resources.getDimensionPixelSize(R.dimen.corner_radius) //
 
             // 加载图片到预览
             Glide.with(this)
@@ -2352,11 +2371,11 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
             btnSend.text = "更新"
 
             // 应用圆角背景到整个对话框
-            dialogView.setBackgroundResource(R.drawable.rounded_content_background)
+            dialogView.setBackgroundResource(R.drawable.rounded_content_background) //
 
             // 设置按钮圆角背景和文字颜色
-            btnSend.setBackgroundResource(R.drawable.rounded_button_background)
-            btnCancel.setBackgroundResource(R.drawable.rounded_white_button_background)
+            btnSend.setBackgroundResource(R.drawable.rounded_button_background) //
+            btnCancel.setBackgroundResource(R.drawable.rounded_white_button_background) //
             btnSend.setTextColor(ContextCompat.getColor(this, R.color.white))
             btnCancel.setTextColor(ContextCompat.getColor(this, R.color.text_primary))
 
@@ -2366,7 +2385,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                     MotionEvent.ACTION_DOWN -> {
                         // 按下时立即执行动画和触觉反馈
                         startButtonPressAnimation(view as Button)
-                        HapticUtils.performHapticFeedback(this@MainActivity, false)
+                        HapticUtils.performHapticFeedback(this@MainActivity, false) //
                         true
                     }
                     MotionEvent.ACTION_UP -> {
@@ -2414,7 +2433,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                     MotionEvent.ACTION_DOWN -> {
                         // 按下时立即执行动画和轻微触觉反馈
                         startButtonPressAnimation(view as Button)
-                        HapticUtils.performHapticFeedback(this@MainActivity, false)
+                        HapticUtils.performHapticFeedback(this@MainActivity, false) //
                         true
                     }
                     MotionEvent.ACTION_UP -> {
@@ -2528,7 +2547,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
 
         snackbar.setAction("取消") {
             // 添加震动反馈
-            HapticUtils.performViewHapticFeedback(it)
+            HapticUtils.performViewHapticFeedback(it) //
             cancelEditing()
         }
 
@@ -2679,7 +2698,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
      */
     private fun showMessageActions(message: Message, view: View) {
         // 添加震动反馈
-        HapticUtils.performViewHapticFeedback(view)
+        HapticUtils.performViewHapticFeedback(view) //
 
         try {
             // 查找操作按钮区域，考虑消息类型和内容类型
@@ -2833,7 +2852,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                     }
 
                     // 添加轻微触觉反馈
-                    HapticUtils.performHapticFeedback(this, false)
+                    HapticUtils.performHapticFeedback(this, false) //
                     true
                 }
                 MotionEvent.ACTION_UP -> {
@@ -2888,7 +2907,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
      */
     private fun copyMessageToClipboard(content: String) {
         // 添加震动反馈
-        HapticUtils.performHapticFeedback(this)
+        HapticUtils.performHapticFeedback(this) //
 
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Message", content)
