@@ -1,61 +1,54 @@
 package com.example.chatapp
 
 import android.animation.Animator
-import android.view.MotionEvent
-import com.example.chatapp.data.ContentType
-import com.example.chatapp.viewmodel.FeedbackViewModel
-import com.example.chatapp.ui.DocumentViewerActivity
 import android.animation.AnimatorListenerAdapter
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.animation.AnimatorSet
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.OvershootInterpolator
-import android.widget.ImageView
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.bumptech.glide.Glide
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.example.chatapp.utils.DocumentProcessor
 import android.animation.ObjectAnimator
-import android.content.Intent
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
 import android.content.ClipData
-import android.graphics.drawable.GradientDrawable
 import android.content.ClipboardManager
-import android.view.ViewGroup
-import android.widget.Button
-import android.view.Gravity
-import android.widget.FrameLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.net.Uri
-import android.os.Bundle
-import android.view.View
 import android.os.Build
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.animation.AccelerateDecelerateInterpolator
-import com.example.chatapp.data.MessagePagingManager
-import com.example.chatapp.data.SettingsManager
+import android.provider.MediaStore
 import android.util.Log
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.AnimationUtils
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
+import android.view.animation.OvershootInterpolator
+import android.view.inputmethod.InputMethodManager
+import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -66,42 +59,52 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.chatapp.data.ContentType
 import com.example.chatapp.data.Message
+import com.example.chatapp.data.MessagePagingManager
 import com.example.chatapp.data.MessageType
+import com.example.chatapp.data.SettingsManager
 import com.example.chatapp.service.AlarmIntentAnalyzer
 import com.example.chatapp.service.AlarmManager
 import com.example.chatapp.ui.ChatHistoryFragment
+import com.example.chatapp.ui.DocumentViewerActivity
 import com.example.chatapp.ui.ImageViewerActivity
 import com.example.chatapp.ui.MessageAdapter
-import com.example.chatapp.ui.MoreOptionsBottomSheet
 import com.example.chatapp.ui.MomentsActivity
+import com.example.chatapp.ui.MoreOptionsBottomSheet
+import com.example.chatapp.utils.DocumentProcessor
 import com.example.chatapp.utils.HapticUtils
 import com.example.chatapp.viewmodel.ChatViewModel
+import com.example.chatapp.viewmodel.FeedbackViewModel
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.delay
+import org.json.JSONObject
 import java.io.BufferedReader
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
 import java.net.URL
+import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import java.util.regex.Pattern
-import org.json.JSONObject
-import java.io.IOException
-import android.view.inputmethod.InputMethodManager
-import android.graphics.Typeface
-import android.util.TypedValue
-import java.io.File
-import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsListener, ChatHistoryFragment.ChatSelectionListener {
 
@@ -153,6 +156,11 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
     private var pendingMoreOptionsOpen = false
     private var stateRestored = false
 
+    // 用于记录原始的底部 padding 值
+    private var originalBottomPadding: Int = -1
+    private lateinit var mainView: View
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // 初始化 SettingsManager 以在设置主题前获取主题设置
         settingsManager = SettingsManager(this)
@@ -161,14 +169,42 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         applyColorTheme()
 
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge() // 启用边缘到边缘显示
         setContentView(R.layout.activity_main)
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        mainView = findViewById(R.id.main) // 获取根视图
+
+        // 核心修正：处理 WindowInsets，特别是键盘
+        ViewCompat.setOnApplyWindowInsetsListener(mainView) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+
+            // 记录原始的底部 padding（只记录一次）
+            if (originalBottomPadding == -1) {
+                originalBottomPadding = v.paddingBottom
+            }
+
+            // 计算底部 padding：优先使用键盘高度，否则使用系统导航栏高度或原始 padding
+            val bottomPadding = if (imeInsets.bottom > 0) {
+                imeInsets.bottom
+            } else {
+                // 如果键盘未显示，确保底部 padding 至少为系统导航栏高度或原始 padding
+                // 这有助于在没有键盘时，内容不会被导航栏遮挡
+                // 同时，如果原始 padding (例如 XML 中定义的 88dp) 更大，则使用它
+                maxOf(systemBars.bottom, originalBottomPadding)
+            }
+
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding)
+
+            // 确保 RecyclerView 在键盘弹出时能滚动到底部
+            if (imeInsets.bottom > 0 && adapter.itemCount > 0) {
+                recyclerView.post {
+                    recyclerView.scrollToPosition(adapter.itemCount - 1)
+                }
+            }
             insets
         }
+
 
         // 初始化ViewModel
         viewModel = ViewModelProvider(this)[ChatViewModel::class.java]
@@ -321,7 +357,10 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
 
         savedChatIdToRestore?.let { chatId ->
             Log.d(TAG, "正在恢复会话: $chatId")
-            viewModel.switchChat(chatId)
+            lifecycleScope.launch { // 使用 lifecycleScope 启动协程
+                viewModel.switchChat(chatId)
+            }
+
 
             // 如果有滚动位置，也恢复它
             if (intent.hasExtra("SCROLL_POSITION")) {
@@ -2572,14 +2611,12 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra("SCROLL_POSITION", currentScrollPosition)
             intent.putExtra("RESTORE_CHAT_ID", currentChatId)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
 
-            // 启动新Activity并使用淡入淡出动画
-            startActivity(intent)
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-
-            // 结束当前Activity
+            // 完全重启Activity
             finish()
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+            startActivity(intent)
+            overridePendingTransition(0, 0) // 无动画
         } catch (e: Exception) {
             Log.e(TAG, "主题重建失败: ${e.message}", e)
             // 降级处理：使用系统recreate方法
