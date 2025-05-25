@@ -81,7 +81,7 @@ class AboutFragment : BaseSettingsSubFragment(), BaseSettingsSubFragment.Navigat
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:shuzhongwubieyi@outlook.com")
             putExtra(Intent.EXTRA_SUBJECT, "Alice 反馈")
-            putExtra(Intent.EXTRA_TEXT, "应用版本：1.7\n\n我想反馈的问题/建议：\n\n")
+            putExtra(Intent.EXTRA_TEXT, "应用版本：1.8\n\n我想反馈的问题/建议：\n\n")
         }
 
         try {
