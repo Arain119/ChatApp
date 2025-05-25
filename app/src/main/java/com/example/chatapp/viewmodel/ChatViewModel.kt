@@ -114,6 +114,19 @@ class ChatViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
+     * 检查并重新处理未完成的消息
+     */
+    fun checkAndReprocessIncompleteMessages() {
+        viewModelScope.launch {
+            try {
+                repository.checkAndReprocessIncompleteMessages()
+            } catch (e: Exception) {
+                Log.e(TAG, "重新处理未完成消息失败: ${e.message}", e)
+            }
+        }
+    }
+
+    /**
      * 发送图像消息
      * @param imageUri 图像URI
      * @param caption 图像标题/描述
