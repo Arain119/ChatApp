@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <!-- SDK版本声明 -->
     <uses-sdk
         android:minSdkVersion="26"
         android:targetSdkVersion="35"
@@ -49,7 +48,8 @@
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -85,13 +85,11 @@
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:exported="false" />
 
-        <!-- 添加UCropActivity -->
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.UCrop" />
 
-        <!-- 动态页面 -->
         <activity
             android:name=".ui.MomentsActivity"
             android:exported="false"
@@ -103,7 +101,6 @@
             android:label="隐私政策">
         </activity>
 
-        <!-- FileProvider 配置 -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:enableOnBackInvokedCallback="true"
@@ -115,7 +112,6 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <!-- 添加文档查看器Activity注册 -->
         <activity
             android:name=".ui.DocumentViewerActivity"
             android:exported="false"
@@ -143,7 +139,6 @@
             android:enableOnBackInvokedCallback="false"
             android:exported="false" />
 
-        <!-- 闹钟接收器 -->
         <receiver
             android:name=".service.AlarmReceiver"
             android:enabled="true"
@@ -156,7 +151,6 @@
             </intent-filter>
         </receiver>
 
-        <!-- 日记闹钟接收器 -->
         <receiver
             android:name=".service.DiaryAlarmReceiver"
             android:enabled="true"
@@ -166,7 +160,6 @@
             </intent-filter>
         </receiver>
 
-        <!-- 启动时重设闹钟接收器 -->
         <receiver
             android:name=".service.BootCompletedReceiver"
             android:enabled="true"
@@ -176,20 +169,17 @@
             </intent-filter>
         </receiver>
 
-        <!-- 闹钟关闭接收器 -->
         <receiver
             android:name=".service.AlarmDismissReceiver"
             android:enabled="true"
             android:exported="false" />
 
-        <!-- 闹钟服务 -->
         <service
             android:name=".service.AlarmService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="specialUse" />
 
-        <!-- 闹钟重新调度服务 -->
         <service
             android:name=".service.AlarmRescheduleService"
             android:enabled="true"
