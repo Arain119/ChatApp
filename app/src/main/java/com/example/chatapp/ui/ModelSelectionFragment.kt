@@ -29,16 +29,29 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textfield.TextInputEditText
 
 /**
- * AI模型选择Fragment
+ * AI模型选择Fragment - 重构版本
  */
 class ModelSelectionFragment : BaseSettingsSubFragment() {
     private lateinit var settingsManager: SettingsManager
     private var modelOptionsContainer: LinearLayout? = null
 
-    // TAG常量
     companion object {
         private const val TAG = "ModelSelectionFragment"
     }
+
+    // 模型数据类
+    data class ModelItem(
+        val id: String,
+        val name: String,
+        val description: String,
+        val isCustom: Boolean,
+        var view: View? = null,
+        var checkView: ImageView? = null
+    )
+
+    // 所有模型项的统一管理
+    private val allModelItems = mutableListOf<ModelItem>()
+    private val settingCards = mutableListOf<View>()
 
     override fun getTitle(): String = "AI模型选择"
 
@@ -58,20 +71,16 @@ class ModelSelectionFragment : BaseSettingsSubFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 延迟动画以等待视图完全绘制
         postponeEnterTransition()
         view.doOnPreDraw { startPostponedEnterTransition() }
 
         modelOptionsContainer = view.findViewById(R.id.modelOptionsContainer)
 
+        // 统一初始化所有模型项
+        initializeAllModels(view)
+
         // 获取当前选择的模型
         val currentModel = settingsManager.modelType
-
-        // 设置模型卡片的圆角涟漪效果
-        setupModelCards(view)
-
-        // 加载自定义模型
-        loadCustomModels()
 
         // 设置选中状态
         updateModelSelection(currentModel)
@@ -84,22 +93,700 @@ class ModelSelectionFragment : BaseSettingsSubFragment() {
     }
 
     /**
+     * 初始化所有模型项
+     */
+    private fun initializeAllModels(rootView: View) {
+        allModelItems.clear()
+        settingCards.clear()
+
+        // 1. 添加默认模型项
+        addDefaultModel(
+            SettingsManager.MODEL_GPT4O_MINI,
+            "GPT-4o Mini",
+            "快速高效的AI模型",
+            rootView.findViewById(R.id.model_gpt4o_mini),
+            rootView.findViewById(R.id.gpt4o_mini_check)
+        )
+
+        addDefaultModel(
+            SettingsManager.MODEL_GPT4O,
+            "GPT-4o",
+            "强大的AI模型",
+            rootView.findViewById(R.id.model_gpt4o),
+            rootView.findViewById(R.id.gpt4o_check)
+        )
+
+        // 2. 添加自定义模型项
+        val customModels = settingsManager.getCustomModels()
+        for (modelName in customModels) {
+            addCustomModel(modelName)
+        }
+
+        // 3. 添加"添加模型"按钮
+        val addModelButton = rootView.findViewById<View>(R.id.add_model_button)
+        if (addModelButton != null) {
+            setupAddModelButton(addModelButton)
+            settingCards.add(addModelButton)
+        }
+
+        Log.d(TAG, "初始化完成，共 ${allModelItems.size} 个模型项，${settingCards.size} 个动画卡片")
+    }
+
+    /**
+     * 添加默认模型项
+     */
+    private fun addDefaultModel(
+        id: String,
+        name: String,
+        description: String,
+        view: View?,
+        checkView: ImageView?
+    ) {
+        if (view != null) {
+            val modelItem = ModelItem(id, name, description, false, view, checkView)
+            allModelItems.add(modelItem)
+
+            // 应用统一样式和点击事件
+            applyUnifiedModelStyle(view, modelItem)
+
+            // 添加到动画列表
+            settingCards.add(view)
+
+            Log.d(TAG, "添加默认模型: $name")
+        }
+    }
+
+    /**
+     * 添加自定义模型项
+     */
+    private fun addCustomModel(modelName: String, playAnimation: Boolean = false) {
+        // 创建视图
+        val modelItemView = layoutInflater.inflate(R.layout.item_custom_model, null)
+
+        // 设置模型名称
+        modelItemView.findViewById<TextView>(R.id.model_name)?.text = modelName
+
+        // 获取选中状态视图
+        val checkView = modelItemView.findViewById<ImageView>(R.id.custom_model_check)
+
+        // 创建模型项数据
+        val modelItem = ModelItem(modelName, modelName, "自定义模型", true, modelItemView, checkView)
+        allModelItems.add(modelItem)
+
+        // 保存模型名称到tag
+        modelItemView.tag = modelName
+
+        // 应用统一样式和点击事件
+        applyUnifiedModelStyle(modelItemView, modelItem)
+
+        // 添加到容器
+        modelOptionsContainer?.let { container ->
+            // 添加分隔线
+            if (container.childCount > 0) {
+                val divider = createDivider()
+                container.addView(divider)
+            }
+
+            // 创建与默认模型完全相同的布局参数
+            val layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+
+            // 检查默认模型的布局参数，尝试复制相同的设置
+            val defaultModelView = view?.findViewById<View>(R.id.model_gpt4o)
+            if (defaultModelView != null && defaultModelView.layoutParams is ViewGroup.MarginLayoutParams) {
+                val defaultParams = defaultModelView.layoutParams as ViewGroup.MarginLayoutParams
+                layoutParams.setMargins(
+                    defaultParams.leftMargin,
+                    defaultParams.topMargin,
+                    defaultParams.rightMargin,
+                    defaultParams.bottomMargin
+                )
+            }
+
+            modelItemView.layoutParams = layoutParams
+
+            container.addView(modelItemView)
+
+            // 添加到动画列表
+            settingCards.add(modelItemView)
+
+            // 如果需要播放动画
+            if (playAnimation) {
+                // 设置动画初始状态
+                modelItemView.alpha = 0f
+                modelItemView.translationX = 100f
+
+                // 添加入场动画
+                modelItemView.animate()
+                    .alpha(1f)
+                    .translationX(0f)
+                    .setDuration(500)
+                    .setInterpolator(DecelerateInterpolator(1.2f))
+                    .start()
+            }
+        }
+
+        Log.d(TAG, "添加自定义模型: $modelName")
+    }
+
+    /**
+     * 应用统一的模型样式和行为 - 修正版本
+     */
+    private fun applyUnifiedModelStyle(view: View, modelItem: ModelItem) {
+        // 统一应用样式 - 所有模型都使用相同的样式
+        view.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_model_ripple)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            view.clipToOutline = true
+            view.elevation = 0f // 统一设置初始elevation
+        }
+
+        // 应用按压效果
+        applyCardPressEffect(view)
+
+        // 设置点击事件
+        view.setOnClickListener { v ->
+            val currentModel = settingsManager.modelType
+            val shouldVibrate = currentModel != modelItem.id
+
+            handleButtonClickWithAnimation(v, shouldVibrate) {
+                selectModel(modelItem.id)
+            }
+        }
+
+        // 为自定义模型添加长按删除
+        if (modelItem.isCustom) {
+            view.setOnLongClickListener { v ->
+                try {
+                    HapticUtils.performHapticFeedback(requireContext(), true)
+                } catch (e: Exception) {
+                    // 忽略错误
+                }
+
+                // 缩放动画
+                v.animate()
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(150)
+                    .withEndAction {
+                        v.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(200)
+                            .start()
+
+                        showDeleteModelDialog(modelItem)
+                    }
+                    .start()
+
+                true
+            }
+        }
+    }
+
+    /**
+     * 选择模型
+     */
+    private fun selectModel(modelId: String) {
+        val oldModel = settingsManager.modelType
+
+        // 如果选择了同一个模型，仅展示动画
+        if (oldModel == modelId) {
+            showSelectionConfirmationAnimation(modelId)
+            return
+        }
+
+        // 更新模型设置
+        settingsManager.modelType = modelId
+
+        // 更新选中状态并展示过渡动画
+        updateModelSelectionWithAnimation(oldModel, modelId)
+
+        // 返回主设置页面
+        view?.postDelayed({
+            notifyNavigationBack()
+        }, 500)
+    }
+
+    /**
+     * 更新模型选择状态 - 统一处理
+     */
+    private fun updateModelSelection(selectedModelId: String) {
+        Log.d(TAG, "更新模型选择状态: $selectedModelId")
+
+        // 清除所有选中状态
+        for (modelItem in allModelItems) {
+            modelItem.checkView?.visibility = View.GONE
+            resetCardStyle(modelItem.view)
+        }
+
+        // 设置选中状态
+        val selectedItem = allModelItems.find { it.id == selectedModelId }
+        if (selectedItem != null) {
+            selectedItem.checkView?.visibility = View.VISIBLE
+            setSelectedCardStyle(selectedItem.view)
+            Log.d(TAG, "模型 ${selectedItem.name} 已设置为选中状态")
+        } else {
+            Log.w(TAG, "未找到模型: $selectedModelId")
+        }
+    }
+
+    /**
+     * 使用动画更新模型选择状态
+     */
+    private fun updateModelSelectionWithAnimation(oldModelId: String, newModelId: String) {
+        // 获取对应的模型项
+        val oldItem = allModelItems.find { it.id == oldModelId }
+        val newItem = allModelItems.find { it.id == newModelId }
+
+        // 清除所有选中状态
+        for (modelItem in allModelItems) {
+            modelItem.checkView?.visibility = View.GONE
+        }
+
+        // 更新卡片样式
+        oldItem?.view?.let { resetCardStyle(it) }
+        newItem?.view?.let { setSelectedCardStyle(it) }
+
+        // 使用动画显示新的选中状态
+        newItem?.checkView?.let { checkView ->
+            // 设置初始状态
+            checkView.visibility = View.VISIBLE
+            checkView.alpha = 0f
+            checkView.scaleX = 0f
+            checkView.scaleY = 0f
+            checkView.rotation = -30f
+
+            // 创建增强动画序列
+            val phase1 = AnimatorSet().apply {
+                playTogether(
+                    ObjectAnimator.ofFloat(checkView, "alpha", 0f, 1f).apply { duration = 200 },
+                    ObjectAnimator.ofFloat(checkView, "scaleX", 0f, 1.4f).apply { duration = 200 },
+                    ObjectAnimator.ofFloat(checkView, "scaleY", 0f, 1.4f).apply { duration = 200 },
+                    ObjectAnimator.ofFloat(checkView, "rotation", -30f, 10f).apply { duration = 200 }
+                )
+            }
+
+            val phase2 = AnimatorSet().apply {
+                playTogether(
+                    ObjectAnimator.ofFloat(checkView, "scaleX", 1.4f, 1f).apply { duration = 300 },
+                    ObjectAnimator.ofFloat(checkView, "scaleY", 1.4f, 1f).apply { duration = 300 },
+                    ObjectAnimator.ofFloat(checkView, "rotation", 10f, 0f).apply { duration = 300 }
+                )
+                interpolator = OvershootInterpolator(3f)
+            }
+
+            val completeAnimation = AnimatorSet()
+            completeAnimation.playSequentially(phase1, phase2)
+            completeAnimation.start()
+        }
+
+        // 为整个卡片添加闪烁动画
+        newItem?.view?.let { view ->
+            val brightnessUp = ObjectAnimator.ofFloat(view, "alpha", 1f, 0.85f, 1f)
+            brightnessUp.duration = 400
+            brightnessUp.interpolator = DecelerateInterpolator()
+            brightnessUp.start()
+        }
+    }
+
+    /**
+     * 展示选择确认动画
+     */
+    private fun showSelectionConfirmationAnimation(modelId: String) {
+        val modelItem = allModelItems.find { it.id == modelId }
+        val checkView = modelItem?.checkView ?: return
+
+        // 保存原始状态
+        val originalScale = checkView.scaleX
+
+        // 创建闪烁动画
+        val scaleUp = ObjectAnimator.ofFloat(checkView, "scaleX", originalScale, 1.5f).apply { duration = 200 }
+        val scaleUp2 = ObjectAnimator.ofFloat(checkView, "scaleY", originalScale, 1.5f).apply { duration = 200 }
+        val scaleDown = ObjectAnimator.ofFloat(checkView, "scaleX", 1.5f, originalScale).apply { duration = 200 }
+        val scaleDown2 = ObjectAnimator.ofFloat(checkView, "scaleY", 1.5f, originalScale).apply { duration = 200 }
+
+        val scaleUpAnim = AnimatorSet().apply { playTogether(scaleUp, scaleUp2) }
+        val scaleDownAnim = AnimatorSet().apply { playTogether(scaleDown, scaleDown2) }
+
+        val animSequence = AnimatorSet().apply { playSequentially(scaleUpAnim, scaleDownAnim) }
+        animSequence.start()
+    }
+
+    /**
+     * 重置卡片样式 - 修正版本
+     */
+    private fun resetCardStyle(view: View?) {
+        view?.let {
+            it.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_model_ripple)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                it.elevation = 0f
+            }
+        }
+    }
+
+    /**
+     * 设置选中卡片样式 - 修正版本
+     */
+    private fun setSelectedCardStyle(view: View?) {
+        view?.let {
+            it.background = ContextCompat.getDrawable(requireContext(), R.drawable.model_selected_background)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                it.elevation = 4f
+
+                // 为钩子图标也设置阴影效果
+                val checkView = if (it.tag != null) {
+                    // 自定义模型
+                    it.findViewById<ImageView>(R.id.custom_model_check)
+                } else {
+                    // 默认模型 - 需要根据具体的ID查找
+                    it.findViewById<ImageView>(R.id.gpt4o_mini_check)
+                        ?: it.findViewById<ImageView>(R.id.gpt4o_check)
+                }
+
+                checkView?.let { check ->
+                    if (check.visibility == View.VISIBLE) {
+                        check.elevation = 6f // 比卡片稍高一点
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 应用卡片按压效果 - 修正版本
+     */
+    private fun applyCardPressEffect(card: View) {
+        card.setOnTouchListener { v, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    val scaleDown = AnimatorSet()
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        scaleDown.playTogether(
+                            ObjectAnimator.ofFloat(v, "scaleX", 0.97f),
+                            ObjectAnimator.ofFloat(v, "scaleY", 0.97f),
+                            ObjectAnimator.ofFloat(v, "alpha", 1f, 0.9f),
+                            ObjectAnimator.ofFloat(v, "elevation", v.elevation, v.elevation + 2f)
+                        )
+                    } else {
+                        scaleDown.playTogether(
+                            ObjectAnimator.ofFloat(v, "scaleX", 0.97f),
+                            ObjectAnimator.ofFloat(v, "scaleY", 0.97f),
+                            ObjectAnimator.ofFloat(v, "alpha", 1f, 0.9f)
+                        )
+                    }
+
+                    scaleDown.duration = 150
+                    scaleDown.interpolator = AccelerateInterpolator(1.5f)
+                    scaleDown.start()
+                    false
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    val scaleUp = AnimatorSet()
+                    val targetElevation = if (isViewSelected(v)) 4f else 0f
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        scaleUp.playTogether(
+                            ObjectAnimator.ofFloat(v, "scaleX", 1f),
+                            ObjectAnimator.ofFloat(v, "scaleY", 1f),
+                            ObjectAnimator.ofFloat(v, "alpha", 0.9f, 1f),
+                            ObjectAnimator.ofFloat(v, "elevation", v.elevation, targetElevation)
+                        )
+                    } else {
+                        scaleUp.playTogether(
+                            ObjectAnimator.ofFloat(v, "scaleX", 1f),
+                            ObjectAnimator.ofFloat(v, "scaleY", 1f),
+                            ObjectAnimator.ofFloat(v, "alpha", 0.9f, 1f)
+                        )
+                    }
+
+                    scaleUp.duration = 300
+                    scaleUp.interpolator = OvershootInterpolator(1.2f)
+                    scaleUp.start()
+                    false
+                }
+                else -> false
+            }
+        }
+    }
+
+    /**
+     * 检查视图是否处于选中状态
+     */
+    private fun isViewSelected(view: View): Boolean {
+        val drawable = view.background ?: return false
+        val selectedDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.model_selected_background)
+        return drawable.constantState == selectedDrawable?.constantState
+    }
+
+    /**
+     * 设置添加模型按钮
+     */
+    private fun setupAddModelButton(addModelButton: View) {
+        // 应用样式
+        addModelButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_model_ripple)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            addModelButton.clipToOutline = true
+            addModelButton.elevation = 0f
+        }
+
+        // 应用按压效果
+        applyCardPressEffect(addModelButton)
+
+        // 设置点击事件
+        addModelButton.setOnClickListener { v ->
+            handleButtonClickWithAnimation(v) {
+                showAddModelDialog()
+            }
+        }
+    }
+
+    /**
+     * 使用动画处理按钮点击
+     */
+    private fun handleButtonClickWithAnimation(view: View, shouldVibrate: Boolean = true, action: () -> Unit) {
+        if (shouldVibrate) {
+            try {
+                HapticUtils.performViewHapticFeedback(view, false)
+            } catch (e: Exception) {
+                // 忽略可能的错误
+            }
+        }
+
+        val scaleDownX = ObjectAnimator.ofFloat(view, "scaleX", 0.96f)
+        val scaleDownY = ObjectAnimator.ofFloat(view, "scaleY", 0.96f)
+        val alphaDown = ObjectAnimator.ofFloat(view, "alpha", 0.9f)
+
+        scaleDownX.duration = 100
+        scaleDownY.duration = 100
+        alphaDown.duration = 100
+
+        val scaleUpX = ObjectAnimator.ofFloat(view, "scaleX", 1.0f)
+        val scaleUpY = ObjectAnimator.ofFloat(view, "scaleY", 1.0f)
+        val alphaUp = ObjectAnimator.ofFloat(view, "alpha", 1.0f)
+
+        scaleUpX.duration = 250
+        scaleUpY.duration = 250
+        alphaUp.duration = 250
+        scaleUpX.interpolator = OvershootInterpolator(2.5f)
+        scaleUpY.interpolator = OvershootInterpolator(2.5f)
+
+        val scaleDown = AnimatorSet()
+        val scaleUp = AnimatorSet()
+        val targetElevation = if (isViewSelected(view)) 4f else 0f
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val elevationUp = ObjectAnimator.ofFloat(view, "elevation", view.elevation + 2f)
+            elevationUp.duration = 100
+
+            val elevationDown = ObjectAnimator.ofFloat(view, "elevation", targetElevation)
+            elevationDown.duration = 250
+
+            scaleDown.playTogether(scaleDownX, scaleDownY, alphaDown, elevationUp)
+            scaleUp.playTogether(scaleUpX, scaleUpY, alphaUp, elevationDown)
+        } else {
+            scaleDown.playTogether(scaleDownX, scaleDownY, alphaDown)
+            scaleUp.playTogether(scaleUpX, scaleUpY, alphaUp)
+        }
+
+        val animatorSet = AnimatorSet()
+        animatorSet.playSequentially(scaleDown, scaleUp)
+        animatorSet.start()
+
+        view.postDelayed(action, 350)
+    }
+
+    /**
+     * 创建分隔线
+     */
+    private fun createDivider(): View {
+        val divider = View(requireContext())
+        val params = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            (resources.displayMetrics.density * 0.5f).toInt()
+        )
+        divider.layoutParams = params
+        divider.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.divider))
+
+        params.marginStart = (resources.displayMetrics.density * 72).toInt()
+        params.marginEnd = (resources.displayMetrics.density * 20).toInt()
+        divider.layoutParams = params
+
+        return divider
+    }
+
+    /**
+     * 显示添加模型对话框
+     */
+    private fun showAddModelDialog() {
+        val builder = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_add_model, null)
+        builder.setView(dialogView)
+
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        val modelNameInput = dialogView.findViewById<TextInputEditText>(R.id.model_name_input)
+        val btnCancel = dialogView.findViewById<MaterialButton>(R.id.btnCancel)
+        val btnAdd = dialogView.findViewById<MaterialButton>(R.id.btnAdd)
+
+        // 设置对话框入场动画
+        dialogView.alpha = 0f
+        dialogView.scaleX = 0.9f
+        dialogView.scaleY = 0.9f
+
+        dialog.setOnShowListener {
+            val animatorSet = AnimatorSet()
+            animatorSet.playTogether(
+                ObjectAnimator.ofFloat(dialogView, "alpha", 0f, 1f),
+                ObjectAnimator.ofFloat(dialogView, "scaleX", 0.9f, 1f),
+                ObjectAnimator.ofFloat(dialogView, "scaleY", 0.9f, 1f)
+            )
+            animatorSet.duration = 300
+            animatorSet.interpolator = DecelerateInterpolator(1.5f)
+            animatorSet.start()
+
+            modelNameInput.requestFocus()
+            val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            imm.showSoftInput(modelNameInput, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+        }
+
+        btnCancel.setOnClickListener {
+            try {
+                HapticUtils.performViewHapticFeedback(it, false)
+            } catch (e: Exception) {}
+            dialog.dismiss()
+        }
+
+        btnAdd.setOnClickListener {
+            try {
+                HapticUtils.performViewHapticFeedback(it, false)
+            } catch (e: Exception) {}
+
+            val modelName = modelNameInput.text.toString().trim()
+            if (!TextUtils.isEmpty(modelName)) {
+                addNewCustomModel(modelName)
+                dialog.dismiss()
+            } else {
+                modelNameInput.error = "模型名称不能为空"
+                try {
+                    HapticUtils.performHapticFeedback(requireContext())
+                } catch (e: Exception) {}
+            }
+        }
+
+        dialog.show()
+    }
+
+    /**
+     * 添加新的自定义模型
+     */
+    private fun addNewCustomModel(modelName: String) {
+        val customModels = settingsManager.getCustomModels().toMutableList()
+
+        if (!customModels.contains(modelName) &&
+            modelName != SettingsManager.MODEL_GPT4O_MINI &&
+            modelName != SettingsManager.MODEL_GPT4O) {
+
+            customModels.add(modelName)
+            settingsManager.saveCustomModels(customModels)
+
+            // 添加到UI
+            addCustomModel(modelName, true)
+
+            // 自动选择新添加的模型
+            selectModel(modelName)
+        } else {
+            Toast.makeText(requireContext(), "模型已存在", Toast.LENGTH_SHORT).show()
+            try {
+                HapticUtils.performHapticFeedback(requireContext())
+            } catch (e: Exception) {}
+        }
+    }
+
+    /**
+     * 显示删除模型对话框
+     */
+    private fun showDeleteModelDialog(modelItem: ModelItem) {
+        val builder = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_model, null)
+        builder.setView(dialogView)
+
+        val dialog = builder.create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        dialogView.findViewById<TextView>(R.id.modelNameText)?.text = modelItem.name
+
+        val btnCancel = dialogView.findViewById<MaterialButton>(R.id.btnCancel)
+        val btnDelete = dialogView.findViewById<MaterialButton>(R.id.btnDelete)
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        btnDelete.setOnClickListener {
+            deleteCustomModel(modelItem)
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    /**
+     * 删除自定义模型
+     */
+    private fun deleteCustomModel(modelItem: ModelItem) {
+        // 从数据中删除
+        allModelItems.remove(modelItem)
+        settingCards.remove(modelItem.view)
+
+        val customModels = settingsManager.getCustomModels().toMutableList()
+        customModels.remove(modelItem.id)
+        settingsManager.saveCustomModels(customModels)
+
+        // 从UI中移除
+        modelItem.view?.let { view ->
+            view.animate()
+                .alpha(0f)
+                .scaleX(0.8f)
+                .scaleY(0.8f)
+                .translationX(100f)
+                .setDuration(400)
+                .setInterpolator(AccelerateInterpolator())
+                .withEndAction {
+                    modelOptionsContainer?.let { container ->
+                        val index = container.indexOfChild(view)
+                        if (index > 0) {
+                            val previousView = container.getChildAt(index - 1)
+                            if (previousView.layoutParams.height <= 2) {
+                                container.removeView(previousView)
+                            }
+                        }
+                        container.removeView(view)
+                    }
+                }
+                .start()
+        }
+
+        // 如果当前选中的是被删除的模型，切换到默认模型
+        if (settingsManager.modelType == modelItem.id) {
+            selectModel(SettingsManager.MODEL_GPT4O_MINI)
+        }
+    }
+
+    /**
      * 整体UI的入场动画
      */
     private fun animateUI(view: View) {
         try {
-            // 查找标题文本
             val titleTexts = findTextViewsInContainer(view, 2)
             val title = titleTexts.getOrNull(0)
-
-            // 查找主卡片
             val mainCard = findFirstMaterialCardView(view)
-
-            // 查找底部描述文本
             val bottomTexts = findBottomTextViews(view)
             val description = bottomTexts.lastOrNull()
 
-            // 仅设置标题动画
             title?.let {
                 it.alpha = 0f
                 it.translationY = -50f
@@ -117,7 +804,6 @@ class ModelSelectionFragment : BaseSettingsSubFragment() {
                 }
             }
 
-            // 主卡片动画
             mainCard?.let {
                 it.alpha = 0f
                 it.translationY = 100f
@@ -137,14 +823,11 @@ class ModelSelectionFragment : BaseSettingsSubFragment() {
                 }
                 cardAnim.start()
 
-                // 开始卡片内元素的动画
-                animateCardContents(it)
+                animateCardContents()
             }
 
-            // 底部说明文本动画
             description?.let {
                 it.alpha = 0f
-
                 ObjectAnimator.ofFloat(it, "alpha", 0f, 1f).apply {
                     duration = 500
                     startDelay = 1000
@@ -157,17 +840,39 @@ class ModelSelectionFragment : BaseSettingsSubFragment() {
     }
 
     /**
+     * 为卡片内部元素添加顺序动画
+     */
+    private fun animateCardContents() {
+        // 设置初始状态
+        settingCards.forEach { card ->
+            card.alpha = 0f
+            card.translationX = 100f
+        }
+
+        // 依次为每个卡片添加动画
+        settingCards.forEachIndexed { index, card ->
+            val fadeIn = ObjectAnimator.ofFloat(card, "alpha", 0f, 1f)
+            val slideIn = ObjectAnimator.ofFloat(card, "translationX", 100f, 0f)
+
+            val animSet = AnimatorSet()
+            animSet.playTogether(fadeIn, slideIn)
+            animSet.duration = 500
+            animSet.startDelay = 400L + (index * 100)
+            animSet.interpolator = DecelerateInterpolator(1.2f)
+            animSet.start()
+        }
+    }
+
+    /**
      * 查找容器中的前N个TextView
      */
     private fun findTextViewsInContainer(container: View, count: Int): List<TextView> {
         val result = mutableListOf<TextView>()
 
-        // 如果容器本身是TextView，添加它
         if (container is TextView) {
             result.add(container)
         }
 
-        // 如果容器是ViewGroup，递归查找子视图
         if (container is ViewGroup) {
             for (i in 0 until container.childCount) {
                 val child = container.getChildAt(i)
@@ -176,7 +881,6 @@ class ModelSelectionFragment : BaseSettingsSubFragment() {
                     result.add(child)
                     if (result.size >= count) break
                 } else if (child is ViewGroup) {
-                    // 递归查找，但限制深度以提高效率
                     val childTexts = findTextViewsInContainer(child, count - result.size)
                     result.addAll(childTexts)
                     if (result.size >= count) break
@@ -191,12 +895,10 @@ class ModelSelectionFragment : BaseSettingsSubFragment() {
      * 查找第一个MaterialCardView
      */
     private fun findFirstMaterialCardView(container: View): MaterialCardView? {
-        // 如果容器本身是MaterialCardView，返回它
         if (container is MaterialCardView) {
             return container
         }
 
-        // 如果容器是ViewGroup，递归查找子视图
         if (container is ViewGroup) {
             for (i in 0 until container.childCount) {
                 val child = container.getChildAt(i)
@@ -219,9 +921,7 @@ class ModelSelectionFragment : BaseSettingsSubFragment() {
     private fun findBottomTextViews(container: View): List<TextView> {
         val result = mutableListOf<TextView>()
 
-        // 从最底部的LinearLayout中查找TextView
         if (container is ViewGroup) {
-            // 获取根LinearLayout的最后几个子视图
             val childCount = container.childCount
             if (childCount > 0) {
                 for (i in (childCount - 1) downTo 0) {
@@ -242,184 +942,35 @@ class ModelSelectionFragment : BaseSettingsSubFragment() {
     }
 
     /**
-     * 为卡片内部元素添加顺序动画
-     */
-    private fun animateCardContents(cardView: View) {
-        // 获取模型卡片
-        val gpt4oMiniCard = view?.findViewById<View>(R.id.model_gpt4o_mini)
-        val gpt4oCard = view?.findViewById<View>(R.id.model_gpt4o)
-        val addModelButton = view?.findViewById<View>(R.id.add_model_button)
-
-        // 创建卡片列表 - 只包含模型卡片，不包括标题和子标题
-        val cards = mutableListOf<View>()
-        if (gpt4oMiniCard != null) cards.add(gpt4oMiniCard)
-        if (gpt4oCard != null) cards.add(gpt4oCard)
-
-        // 添加自定义模型卡片
-        modelOptionsContainer?.let { container ->
-            for (i in 0 until container.childCount) {
-                val child = container.getChildAt(i)
-                // 仅添加布局元素，跳过分隔线
-                if (child.layoutParams.height > 2) {
-                    cards.add(child)
-                }
-            }
-        }
-
-        // 添加"添加模型"按钮
-        if (addModelButton != null) cards.add(addModelButton)
-
-        // 设置初始状态
-        cards.forEach { card ->
-            card.alpha = 0f
-            card.translationX = 100f
-        }
-
-        // 依次为每个卡片添加动画
-        cards.forEachIndexed { index, card ->
-            val fadeIn = ObjectAnimator.ofFloat(card, "alpha", 0f, 1f)
-            val slideIn = ObjectAnimator.ofFloat(card, "translationX", 100f, 0f)
-
-            val animSet = AnimatorSet()
-            animSet.playTogether(fadeIn, slideIn)
-            animSet.duration = 500
-            animSet.startDelay = 400L + (index * 100)
-            animSet.interpolator = DecelerateInterpolator(1.2f)
-            animSet.start()
-        }
-    }
-
-    /**
-     * 设置模型卡片的圆角涟漪效果和点击事件
-     */
-    private fun setupModelCards(rootView: View) {
-        // 获取卡片引用
-        val gpt4oMiniCard = rootView.findViewById<View>(R.id.model_gpt4o_mini)
-        val gpt4oCard = rootView.findViewById<View>(R.id.model_gpt4o)
-        val addModelButton = rootView.findViewById<View>(R.id.add_model_button)
-
-        // 设置卡片列表
-        val modelCards = listOf(gpt4oMiniCard, gpt4oCard, addModelButton)
-
-        // 应用圆角涟漪效果和点击事件
-        modelCards.forEach { card ->
-            // 应用圆角涟漪背景
-            card.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_model_ripple)
-
-            // 确保正确剪裁
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                card.clipToOutline = true
-            }
-
-            // 应用卡片按压效果
-            applyCardPressEffect(card)
-        }
-
-        // 设置点击事件
-        gpt4oMiniCard.setOnClickListener { v ->
-            val currentModel = settingsManager.modelType
-            val newModel = SettingsManager.MODEL_GPT4O_MINI
-            val shouldVibrate = currentModel != newModel
-
-            handleButtonClickWithAnimation(v, shouldVibrate) {
-                updateModel(newModel)
-            }
-        }
-
-        gpt4oCard.setOnClickListener { v ->
-            val currentModel = settingsManager.modelType
-            val newModel = SettingsManager.MODEL_GPT4O
-            val shouldVibrate = currentModel != newModel
-
-            handleButtonClickWithAnimation(v, shouldVibrate) {
-                updateModel(newModel)
-            }
-        }
-
-        addModelButton.setOnClickListener { v ->
-            handleButtonClickWithAnimation(v) {
-                showAddModelDialog()
-            }
-        }
-    }
-
-    /**
-     * 添加卡片按压效果
-     */
-    private fun applyCardPressEffect(card: View?) {
-        card?.setOnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    // 添加突变动画效果
-                    val scaleDown = AnimatorSet()
-                    scaleDown.playTogether(
-                        ObjectAnimator.ofFloat(v, "scaleX", 0.97f),
-                        ObjectAnimator.ofFloat(v, "scaleY", 0.97f),
-                        ObjectAnimator.ofFloat(v, "translationZ", 0f, 8f),
-                        ObjectAnimator.ofFloat(v, "alpha", 1f, 0.9f)
-                    )
-                    scaleDown.duration = 150
-                    scaleDown.interpolator = AccelerateInterpolator(1.5f)
-                    scaleDown.start()
-
-                    false
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    // 恢复原状，使用OvershootInterpolator实现轻微弹跳效果
-                    val scaleUp = AnimatorSet()
-                    scaleUp.playTogether(
-                        ObjectAnimator.ofFloat(v, "scaleX", 1f),
-                        ObjectAnimator.ofFloat(v, "scaleY", 1f),
-                        ObjectAnimator.ofFloat(v, "translationZ", 8f, 0f),
-                        ObjectAnimator.ofFloat(v, "alpha", 0.9f, 1f)
-                    )
-                    scaleUp.duration = 300
-                    scaleUp.interpolator = OvershootInterpolator(1.2f)
-                    scaleUp.start()
-                    false
-                }
-                else -> false
-            }
-        }
-    }
-
-    /**
      * 添加主动消息设置卡片
      */
     private fun addProactiveMessageSettingsCard(view: View) {
         try {
-            // 创建主动消息设置卡片视图
             val cardView = layoutInflater.inflate(R.layout.card_proactive_message_settings, null)
 
-            // 应用圆角涟漪背景
             cardView.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_model_ripple)
 
-            // 确保正确剪裁
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 cardView.clipToOutline = true
+                cardView.elevation = 0f
             }
 
-            // 为卡片添加按压效果
             applyCardPressEffect(cardView)
 
-            // 设置卡片点击事件
             cardView.setOnClickListener { v ->
                 handleButtonClickWithAnimation(v) {
                     navigateToProactiveMessageSettings()
                 }
             }
 
-            // 设置卡片初始状态
             cardView.alpha = 0f
             cardView.translationY = 50f
 
-            // 将卡片添加到布局中
             val container = view.findViewById<ViewGroup>(R.id.additionalOptionsContainer)
 
             if (container != null) {
                 container.addView(cardView)
 
-                // 添加动画效果
                 cardView.animate()
                     .alpha(1f)
                     .translationY(0f)
@@ -427,8 +978,6 @@ class ModelSelectionFragment : BaseSettingsSubFragment() {
                     .setStartDelay(1200)
                     .setInterpolator(DecelerateInterpolator(1.3f))
                     .start()
-            } else {
-                Log.e(TAG, "找不到添加卡片的容器")
             }
 
         } catch (e: Exception) {
@@ -441,884 +990,12 @@ class ModelSelectionFragment : BaseSettingsSubFragment() {
      */
     private fun navigateToProactiveMessageSettings() {
         try {
-            // 创建并启动Activity
             val intent = Intent(requireContext(), ProactiveMessageSettingsActivity::class.java)
             startActivity(intent)
-
-            // 添加过渡动画
-            requireActivity().overridePendingTransition(
-                R.anim.slide_in_right,
-                R.anim.slide_out_left
-            )
+            requireActivity().overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left)
         } catch (e: Exception) {
             Log.e(TAG, "启动主动消息设置Activity失败: ${e.message}", e)
             Toast.makeText(requireContext(), "无法打开主动消息设置", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    /**
-     * 使用动画处理按钮点击
-     */
-    private fun handleButtonClickWithAnimation(view: View, shouldVibrate: Boolean = true, action: () -> Unit) {
-        // 添加震动反馈
-        if (shouldVibrate) {
-            try {
-                HapticUtils.performViewHapticFeedback(view, false)
-            } catch (e: Exception) {
-                // 忽略可能的错误
-            }
-        }
-
-        // 创建动画集
-        val animatorSet = AnimatorSet()
-
-        // 第一阶段：快速缩小
-        val scaleDownX = ObjectAnimator.ofFloat(view, "scaleX", 0.96f)
-        val scaleDownY = ObjectAnimator.ofFloat(view, "scaleY", 0.96f)
-        val alphaDown = ObjectAnimator.ofFloat(view, "alpha", 0.9f)
-        val elevationUp = ObjectAnimator.ofFloat(view, "translationZ", 12f)
-
-        scaleDownX.duration = 100
-        scaleDownY.duration = 100
-        alphaDown.duration = 100
-        elevationUp.duration = 100
-
-        // 第二阶段：反弹恢复
-        val scaleUpX = ObjectAnimator.ofFloat(view, "scaleX", 1.0f)
-        val scaleUpY = ObjectAnimator.ofFloat(view, "scaleY", 1.0f)
-        val alphaUp = ObjectAnimator.ofFloat(view, "alpha", 1.0f)
-        val elevationDown = ObjectAnimator.ofFloat(view, "translationZ", 0f)
-
-        scaleUpX.duration = 250
-        scaleUpY.duration = 250
-        alphaUp.duration = 250
-        elevationDown.duration = 250
-        scaleUpX.interpolator = OvershootInterpolator(2.5f)
-        scaleUpY.interpolator = OvershootInterpolator(2.5f)
-
-        // 播放序列动画
-        val scaleDown = AnimatorSet()
-        scaleDown.playTogether(scaleDownX, scaleDownY, alphaDown, elevationUp)
-
-        val scaleUp = AnimatorSet()
-        scaleUp.playTogether(scaleUpX, scaleUpY, alphaUp, elevationDown)
-
-        animatorSet.playSequentially(scaleDown, scaleUp)
-        animatorSet.start()
-
-        // 动画结束后执行操作
-        view.postDelayed(action, 350)
-    }
-
-    /**
-     * 更新模型设置并展示动画
-     */
-    private fun updateModel(model: String) {
-        // 保存旧模型，用于动画
-        val oldModel = settingsManager.modelType
-
-        // 如果选择了同一个模型，仅展示动画
-        if (oldModel == model) {
-            // 仅展示确认动画
-            showSelectionConfirmationAnimation(getViewForModel(model))
-            return
-        }
-
-        // 更新模型设置
-        settingsManager.modelType = model
-
-        // 更新选中状态并展示过渡动画
-        updateModelSelectionWithAnimation(oldModel, model)
-
-        // 返回主设置页面
-        view?.postDelayed({
-            notifyNavigationBack()
-        }, 500) // 延迟返回，让动画有时间完成
-    }
-
-    /**
-     * 获取指定模型对应的视图
-     */
-    private fun getViewForModel(model: String): View? {
-        return when (model) {
-            SettingsManager.MODEL_GPT4O_MINI -> view?.findViewById(R.id.model_gpt4o_mini)
-            SettingsManager.MODEL_GPT4O -> view?.findViewById(R.id.model_gpt4o)
-            else -> {
-                // 查找自定义模型视图
-                var customView: View? = null
-                modelOptionsContainer?.let { container ->
-                    for (i in 0 until container.childCount) {
-                        val child = container.getChildAt(i)
-                        // 仅检查非分隔线元素
-                        if (child.layoutParams.height > 2 && child.tag == model) {
-                            customView = child
-                            break
-                        }
-                    }
-                }
-                customView
-            }
-        }
-    }
-
-    /**
-     * 展示选择确认动画
-     */
-    private fun showSelectionConfirmationAnimation(view: View?) {
-        view ?: return
-
-        // 找到检查标记
-        val checkView = when (view.id) {
-            R.id.model_gpt4o_mini -> view.findViewById<ImageView>(R.id.gpt4o_mini_check)
-            R.id.model_gpt4o -> view.findViewById<ImageView>(R.id.gpt4o_check)
-            else -> view.findViewById<ImageView>(R.id.custom_model_check)
-        }
-
-        checkView ?: return
-
-        // 保存原始状态
-        val originalScale = checkView.scaleX
-        val originalAlpha = checkView.alpha
-
-        // 创建闪烁动画
-        val scaleUp = ObjectAnimator.ofFloat(checkView, "scaleX", originalScale, 1.5f).apply {
-            duration = 200
-        }
-        val scaleUp2 = ObjectAnimator.ofFloat(checkView, "scaleY", originalScale, 1.5f).apply {
-            duration = 200
-        }
-        val scaleDown = ObjectAnimator.ofFloat(checkView, "scaleX", 1.5f, originalScale).apply {
-            duration = 200
-        }
-        val scaleDown2 = ObjectAnimator.ofFloat(checkView, "scaleY", 1.5f, originalScale).apply {
-            duration = 200
-        }
-
-        // 组合动画
-        val scaleUpAnim = AnimatorSet().apply {
-            playTogether(scaleUp, scaleUp2)
-        }
-        val scaleDownAnim = AnimatorSet().apply {
-            playTogether(scaleDown, scaleDown2)
-        }
-
-        val animSequence = AnimatorSet().apply {
-            playSequentially(scaleUpAnim, scaleDownAnim)
-        }
-        animSequence.start()
-    }
-
-    /**
-     * 使用动画更新模型选择状态
-     */
-    private fun updateModelSelectionWithAnimation(oldModel: String, newModel: String) {
-        // 获取对应的视图
-        val oldView = getViewForModel(oldModel)
-        val newView = getViewForModel(newModel)
-
-        // 清除所有选中状态标记
-        val rootView = view ?: return
-        val gpt4oMiniCheck = rootView.findViewById<ImageView>(R.id.gpt4o_mini_check)
-        val gpt4oCheck = rootView.findViewById<ImageView>(R.id.gpt4o_check)
-
-        gpt4oMiniCheck?.visibility = View.GONE
-        gpt4oCheck?.visibility = View.GONE
-
-        // 清除自定义模型的选中状态
-        modelOptionsContainer?.let { container ->
-            for (i in 0 until container.childCount) {
-                val child = container.getChildAt(i)
-                if (child.layoutParams.height > 2) { // 非分隔线
-                    child.findViewById<ImageView>(R.id.custom_model_check)?.visibility = View.GONE
-                }
-            }
-        }
-
-        // 更新卡片样式
-        oldView?.let { resetCardStyle(it) }
-        newView?.let { setSelectedCardStyle(it) }
-
-        // 使用动画显示新的选中状态
-        val checkView = when {
-            newModel == SettingsManager.MODEL_GPT4O_MINI -> gpt4oMiniCheck
-            newModel == SettingsManager.MODEL_GPT4O -> gpt4oCheck
-            else -> newView?.findViewById<ImageView>(R.id.custom_model_check)
-        }
-
-        checkView?.let {
-            // 设置初始状态
-            it.visibility = View.VISIBLE
-            it.alpha = 0f
-            it.scaleX = 0f
-            it.scaleY = 0f
-            it.rotation = -30f  // 添加旋转初始状态
-
-            // 创建增强动画序列
-            // 第一阶段：快速放大并旋转
-            val phase1 = AnimatorSet().apply {
-                playTogether(
-                    ObjectAnimator.ofFloat(it, "alpha", 0f, 1f).apply {
-                        duration = 200
-                    },
-                    ObjectAnimator.ofFloat(it, "scaleX", 0f, 1.4f).apply {
-                        duration = 200
-                    },
-                    ObjectAnimator.ofFloat(it, "scaleY", 0f, 1.4f).apply {
-                        duration = 200
-                    },
-                    ObjectAnimator.ofFloat(it, "rotation", -30f, 10f).apply {
-                        duration = 200
-                    }
-                )
-            }
-
-            // 第二阶段：弹性收缩并完成旋转
-            val phase2 = AnimatorSet().apply {
-                playTogether(
-                    ObjectAnimator.ofFloat(it, "scaleX", 1.4f, 1f).apply {
-                        duration = 300
-                    },
-                    ObjectAnimator.ofFloat(it, "scaleY", 1.4f, 1f).apply {
-                        duration = 300
-                    },
-                    ObjectAnimator.ofFloat(it, "rotation", 10f, 0f).apply {
-                        duration = 300
-                    }
-                )
-                interpolator = OvershootInterpolator(3f)
-            }
-
-            // 组合并播放动画
-            val completeAnimation = AnimatorSet()
-            completeAnimation.playSequentially(phase1, phase2)
-            completeAnimation.start()
-        }
-
-        // 为整个卡片添加轻微的亮度闪烁动画
-        newView?.let { view ->
-            val brightnessUp = ObjectAnimator.ofFloat(view, "alpha", 1f, 0.85f, 1f)
-            brightnessUp.duration = 400
-            brightnessUp.interpolator = DecelerateInterpolator()
-            brightnessUp.start()
-        }
-    }
-
-    /**
-     * 更新模型选择状态
-     */
-    private fun updateModelSelection(selectedModel: String) {
-        // 清除所有选中状态
-        val rootView = view ?: return
-
-        val gpt4oMiniCheck = rootView.findViewById<ImageView>(R.id.gpt4o_mini_check)
-        val gpt4oCheck = rootView.findViewById<ImageView>(R.id.gpt4o_check)
-
-        gpt4oMiniCheck?.visibility = View.GONE
-        gpt4oCheck?.visibility = View.GONE
-
-        // 清除自定义模型的选中状态
-        modelOptionsContainer?.let { container ->
-            for (i in 0 until container.childCount) {
-                val child = container.getChildAt(i)
-                if (child.layoutParams.height > 2) { // 非分隔线
-                    child.findViewById<ImageView>(R.id.custom_model_check)?.visibility = View.GONE
-                }
-            }
-        }
-
-        // 高亮显示所选模型项
-        highlightSelectedCard(rootView, selectedModel)
-
-        // 设置当前选中状态
-        when (selectedModel) {
-            SettingsManager.MODEL_GPT4O_MINI -> {
-                gpt4oMiniCheck?.visibility = View.VISIBLE
-            }
-            SettingsManager.MODEL_GPT4O -> {
-                gpt4oCheck?.visibility = View.VISIBLE
-            }
-            else -> {
-                // 检查是否是自定义模型
-                modelOptionsContainer?.let { container ->
-                    for (i in 0 until container.childCount) {
-                        val child = container.getChildAt(i)
-                        if (child.layoutParams.height > 2) { // 非分隔线
-                            val modelName = child.tag as? String
-                            if (modelName == selectedModel) {
-                                child.findViewById<ImageView>(R.id.custom_model_check)?.visibility = View.VISIBLE
-                                break
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 高亮显示所选卡片
-     */
-    private fun highlightSelectedCard(rootView: View, selectedModel: String) {
-        // 重置所有卡片样式
-        val mini = rootView.findViewById<View>(R.id.model_gpt4o_mini)
-        val full = rootView.findViewById<View>(R.id.model_gpt4o)
-
-        resetCardStyle(mini)
-        resetCardStyle(full)
-
-        // 重置所有自定义模型卡片
-        modelOptionsContainer?.let { container ->
-            for (i in 0 until container.childCount) {
-                val child = container.getChildAt(i)
-                if (child.layoutParams.height > 2) { // 非分隔线
-                    resetCardStyle(child)
-                }
-            }
-        }
-
-        // 设置选中卡片样式
-        when (selectedModel) {
-            SettingsManager.MODEL_GPT4O_MINI -> {
-                setSelectedCardStyle(mini)
-            }
-            SettingsManager.MODEL_GPT4O -> {
-                setSelectedCardStyle(full)
-            }
-            else -> {
-                // 检查自定义模型
-                modelOptionsContainer?.let { container ->
-                    for (i in 0 until container.childCount) {
-                        val child = container.getChildAt(i)
-                        if (child.layoutParams.height > 2) { // 非分隔线
-                            val modelName = child.tag as? String
-                            if (selectedModel == modelName) {
-                                setSelectedCardStyle(child)
-                                break
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 重置卡片样式
-     */
-    private fun resetCardStyle(card: View?) {
-        card?.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_model_ripple)
-        card?.elevation = 0f
-    }
-
-    /**
-     * 设置选中卡片样式
-     */
-    private fun setSelectedCardStyle(card: View?) {
-        card?.background = ContextCompat.getDrawable(requireContext(), R.drawable.model_selected_background)
-        // 增加轻微阴影效果
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            card?.elevation = 4f
-        }
-    }
-
-    /**
-     * 显示添加模型对话框
-     */
-    private fun showAddModelDialog() {
-        val builder = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
-        val dialogView = layoutInflater.inflate(R.layout.dialog_add_model, null)
-        builder.setView(dialogView)
-
-        // 创建圆角对话框
-        val dialog = builder.create()
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-        // 获取输入框
-        val modelNameInput = dialogView.findViewById<TextInputEditText>(R.id.model_name_input)
-
-        // 获取按钮
-        val btnCancel = dialogView.findViewById<MaterialButton>(R.id.btnCancel)
-        val btnAdd = dialogView.findViewById<MaterialButton>(R.id.btnAdd)
-
-        // 设置按钮点击动画
-        applyButtonAnimation(btnCancel)
-        applyButtonAnimation(btnAdd)
-
-        // 设置对话框入场动画
-        dialogView.alpha = 0f
-        dialogView.scaleX = 0.9f
-        dialogView.scaleY = 0.9f
-
-        dialog.setOnShowListener {
-            val animatorSet = AnimatorSet()
-            animatorSet.playTogether(
-                ObjectAnimator.ofFloat(dialogView, "alpha", 0f, 1f),
-                ObjectAnimator.ofFloat(dialogView, "scaleX", 0.9f, 1f),
-                ObjectAnimator.ofFloat(dialogView, "scaleY", 0.9f, 1f)
-            )
-            animatorSet.duration = 300
-            animatorSet.interpolator = DecelerateInterpolator(1.5f)
-            animatorSet.start()
-
-            // 自动显示键盘
-            modelNameInput.requestFocus()
-            val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
-            imm.showSoftInput(modelNameInput, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
-        }
-
-        // 设置取消按钮
-        btnCancel.setOnClickListener { v ->
-            // 添加震动反馈
-            try {
-                HapticUtils.performViewHapticFeedback(v, false)
-            } catch (e: Exception) {
-                // 忽略错误
-            }
-
-            // 播放动画
-            playButtonAnimation(v) {
-                // 对话框退出动画
-                val animatorSet = AnimatorSet()
-                animatorSet.playTogether(
-                    ObjectAnimator.ofFloat(dialogView, "alpha", 1f, 0f),
-                    ObjectAnimator.ofFloat(dialogView, "scaleX", 1f, 0.9f),
-                    ObjectAnimator.ofFloat(dialogView, "scaleY", 1f, 0.9f)
-                )
-                animatorSet.duration = 200
-                animatorSet.interpolator = AccelerateInterpolator(1.5f)
-                animatorSet.addListener(object : android.animation.AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: android.animation.Animator) {
-                        dialog.dismiss()
-                    }
-                })
-                animatorSet.start()
-            }
-        }
-
-        // 设置添加按钮
-        btnAdd.setOnClickListener { v ->
-            // 添加震动反馈
-            try {
-                HapticUtils.performViewHapticFeedback(v, false)
-            } catch (e: Exception) {
-                // 忽略错误
-            }
-
-            val modelName = modelNameInput.text.toString().trim()
-            if (!TextUtils.isEmpty(modelName)) {
-                playButtonAnimation(v) {
-                    // 成功添加动画
-                    val successAnimSet = AnimatorSet()
-                    successAnimSet.playTogether(
-                        ObjectAnimator.ofFloat(dialogView, "alpha", 1f, 0f),
-                        ObjectAnimator.ofFloat(dialogView, "scaleX", 1f, 1.05f),
-                        ObjectAnimator.ofFloat(dialogView, "scaleY", 1f, 1.05f)
-                    )
-                    successAnimSet.duration = 200
-                    successAnimSet.interpolator = AccelerateInterpolator()
-                    successAnimSet.addListener(object : android.animation.AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: android.animation.Animator) {
-                            addCustomModel(modelName)
-                            dialog.dismiss()
-                        }
-                    })
-                    successAnimSet.start()
-                }
-            } else {
-                // 显示错误动画
-                val shakeAnimation = ObjectAnimator.ofFloat(modelNameInput, "translationX",
-                    0f, -15f, 15f, -10f, 10f, -5f, 5f, 0f)
-                shakeAnimation.duration = 500
-                shakeAnimation.start()
-
-                modelNameInput.error = "模型名称不能为空"
-                // 轻微震动提示错误
-                try {
-                    HapticUtils.performHapticFeedback(requireContext())
-                } catch (e: Exception) {
-                    // 忽略错误
-                }
-            }
-        }
-
-        // 显示对话框
-        dialog.show()
-    }
-
-    /**
-     * 应用按钮动画效果
-     */
-    private fun applyButtonAnimation(button: View) {
-        button.setOnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    val scaleDown = AnimatorSet().apply {
-                        playTogether(
-                            ObjectAnimator.ofFloat(v, "scaleX", 0.95f),
-                            ObjectAnimator.ofFloat(v, "scaleY", 0.95f),
-                            ObjectAnimator.ofFloat(v, "alpha", 0.9f)
-                        )
-                        duration = 100
-                        interpolator = AccelerateInterpolator()
-                    }
-                    scaleDown.start()
-                    false
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    val scaleUp = AnimatorSet().apply {
-                        playTogether(
-                            ObjectAnimator.ofFloat(v, "scaleX", 1f),
-                            ObjectAnimator.ofFloat(v, "scaleY", 1f),
-                            ObjectAnimator.ofFloat(v, "alpha", 1f)
-                        )
-                        duration = 200
-                        interpolator = OvershootInterpolator(1.5f)
-                    }
-                    scaleUp.start()
-                    false
-                }
-                else -> false
-            }
-        }
-    }
-
-    /**
-     * 播放按钮动画，然后执行操作
-     */
-    private fun playButtonAnimation(button: View, action: () -> Unit) {
-        // 第一阶段：快速缩小
-        val scaleDownX = ObjectAnimator.ofFloat(button, "scaleX", 0.9f)
-        val scaleDownY = ObjectAnimator.ofFloat(button, "scaleY", 0.9f)
-        val alphaDown = ObjectAnimator.ofFloat(button, "alpha", 0.8f)
-        scaleDownX.duration = 100
-        scaleDownY.duration = 100
-        alphaDown.duration = 100
-
-        // 第二阶段：反弹恢复
-        val scaleUpX = ObjectAnimator.ofFloat(button, "scaleX", 1.0f)
-        val scaleUpY = ObjectAnimator.ofFloat(button, "scaleY", 1.0f)
-        val alphaUp = ObjectAnimator.ofFloat(button, "alpha", 1.0f)
-        scaleUpX.duration = 250
-        scaleUpY.duration = 250
-        alphaUp.duration = 250
-        scaleUpX.interpolator = OvershootInterpolator(3f)
-        scaleUpY.interpolator = OvershootInterpolator(3f)
-
-        // 播放序列动画
-        val scaleDown = AnimatorSet()
-        scaleDown.playTogether(scaleDownX, scaleDownY, alphaDown)
-
-        val scaleUp = AnimatorSet()
-        scaleUp.playTogether(scaleUpX, scaleUpY, alphaUp)
-
-        val animatorSet = AnimatorSet()
-        animatorSet.playSequentially(scaleDown, scaleUp)
-        animatorSet.start()
-
-        // 动画结束后执行操作
-        button.postDelayed(action, 350)
-    }
-
-    /**
-     * 添加自定义模型
-     */
-    private fun addCustomModel(modelName: String) {
-        // 保存自定义模型
-        val customModels = settingsManager.getCustomModels().toMutableList()
-
-        // 检查模型是否已存在
-        if (!customModels.contains(modelName) &&
-            modelName != SettingsManager.MODEL_GPT4O_MINI &&
-            modelName != SettingsManager.MODEL_GPT4O) {
-
-            customModels.add(modelName)
-            settingsManager.saveCustomModels(customModels)
-
-            // 添加到UI
-            addModelToUI(modelName)
-
-            // 自动选择新添加的模型
-            updateModel(modelName)
-        } else {
-            // 显示错误提示
-            Toast.makeText(requireContext(), "模型已存在", Toast.LENGTH_SHORT).show()
-
-            // 轻微震动提示错误
-            try {
-                HapticUtils.performHapticFeedback(requireContext())
-            } catch (e: Exception) {
-                // 忽略错误
-            }
-        }
-    }
-
-    private fun loadCustomModels() {
-        val customModels = settingsManager.getCustomModels()
-        for (model in customModels) {
-            addModelToUI(model)
-        }
-    }
-
-    /**
-     * 添加模型到UI
-     */
-    private fun addModelToUI(modelName: String) {
-        // 使用布局文件加载视图
-        val modelItemView = layoutInflater.inflate(R.layout.item_custom_model, null)
-
-        // 设置模型名称
-        modelItemView.findViewById<TextView>(R.id.model_name)?.text = modelName
-
-        // 保存模型名称到tag
-        modelItemView.tag = modelName
-
-        // 应用圆角涟漪背景
-        modelItemView.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_model_ripple)
-
-        // 确保正确剪裁
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            modelItemView.clipToOutline = true
-        }
-
-        // 应用卡片按压效果
-        applyCardPressEffect(modelItemView)
-
-        // 设置点击事件
-        modelItemView.setOnClickListener { v ->
-            val currentModel = settingsManager.modelType
-            val shouldVibrate = currentModel != modelName
-
-            handleButtonClickWithAnimation(v, shouldVibrate) {
-                updateModel(modelName)
-            }
-        }
-
-        // 设置长按删除
-        modelItemView.setOnLongClickListener { v ->
-            // 添加震动反馈
-            try {
-                HapticUtils.performHapticFeedback(requireContext(), true)
-            } catch (e: Exception) {
-                // 忽略错误
-            }
-
-            // 缩放动画
-            v.animate()
-                .scaleX(0.95f)
-                .scaleY(0.95f)
-                .setDuration(150)
-                .withEndAction {
-                    v.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(200)
-                        .start()
-
-                    // 显示删除对话框
-                    showDeleteModelDialog(modelName, modelItemView)
-                }
-                .start()
-
-            true
-        }
-
-        // 设置动画初始状态
-        modelItemView.alpha = 0f
-        modelItemView.translationX = 100f
-
-        // 添加到容器
-        modelOptionsContainer?.let { container ->
-            // 添加分隔线
-            if (container.childCount > 0) {
-                val divider = View(requireContext())
-                val params = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    (resources.displayMetrics.density * 0.5f).toInt())
-                divider.layoutParams = params
-                divider.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.divider))
-
-                // 设置左边距
-                params.marginStart = (resources.displayMetrics.density * 72).toInt()
-                params.marginEnd = (resources.displayMetrics.density * 20).toInt()
-                divider.layoutParams = params
-
-                container.addView(divider)
-            }
-
-            container.addView(modelItemView)
-
-            // 添加入场动画
-            modelItemView.animate()
-                .alpha(1f)
-                .translationX(0f)
-                .setDuration(500)
-                .setInterpolator(DecelerateInterpolator(1.2f))
-                .start()
-        }
-    }
-
-    /**
-     * 显示删除模型对话框
-     */
-    private fun showDeleteModelDialog(modelName: String, modelView: View) {
-        val builder = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialog)
-        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_model, null)
-        builder.setView(dialogView)
-
-        // 创建圆角对话框
-        val dialog = builder.create()
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-
-        // 设置模型名称
-        dialogView.findViewById<TextView>(R.id.modelNameText)?.text = modelName
-
-        // 获取按钮
-        val btnCancel = dialogView.findViewById<MaterialButton>(R.id.btnCancel)
-        val btnDelete = dialogView.findViewById<MaterialButton>(R.id.btnDelete)
-
-        // 设置按钮动画
-        applyButtonAnimation(btnCancel)
-        applyButtonAnimation(btnDelete)
-
-        // 设置对话框入场动画
-        dialogView.alpha = 0f
-        dialogView.scaleX = 0.9f
-        dialogView.scaleY = 0.9f
-
-        dialog.setOnShowListener {
-            val animatorSet = AnimatorSet()
-            animatorSet.playTogether(
-                ObjectAnimator.ofFloat(dialogView, "alpha", 0f, 1f),
-                ObjectAnimator.ofFloat(dialogView, "scaleX", 0.9f, 1f),
-                ObjectAnimator.ofFloat(dialogView, "scaleY", 0.9f, 1f)
-            )
-            animatorSet.duration = 300
-            animatorSet.interpolator = DecelerateInterpolator(1.5f)
-            animatorSet.start()
-        }
-
-        // 设置取消按钮
-        btnCancel.setOnClickListener { v ->
-            // 添加震动反馈
-            try {
-                HapticUtils.performViewHapticFeedback(v, false)
-            } catch (e: Exception) {
-                // 忽略错误
-            }
-
-            // 播放动画
-            playButtonAnimation(v) {
-                // 对话框退出动画
-                val animatorSet = AnimatorSet()
-                animatorSet.playTogether(
-                    ObjectAnimator.ofFloat(dialogView, "alpha", 1f, 0f),
-                    ObjectAnimator.ofFloat(dialogView, "scaleX", 1f, 0.9f),
-                    ObjectAnimator.ofFloat(dialogView, "scaleY", 1f, 0.9f)
-                )
-                animatorSet.duration = 200
-                animatorSet.interpolator = AccelerateInterpolator(1.5f)
-                animatorSet.addListener(object : android.animation.AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: android.animation.Animator) {
-                        dialog.dismiss()
-                    }
-                })
-                animatorSet.start()
-            }
-        }
-
-        // 设置删除按钮
-        btnDelete.setOnClickListener { v ->
-            // 添加震动反馈
-            try {
-                HapticUtils.performViewHapticFeedback(v, true) // 强震动
-            } catch (e: Exception) {
-                // 忽略错误
-            }
-
-            // 播放动画
-            playButtonAnimation(v) {
-                // 对话框确认动画
-                val animatorSet = AnimatorSet()
-                animatorSet.playTogether(
-                    ObjectAnimator.ofFloat(dialogView, "alpha", 1f, 0f),
-                    ObjectAnimator.ofFloat(dialogView, "scaleX", 1f, 0.9f),
-                    ObjectAnimator.ofFloat(dialogView, "scaleY", 1f, 0.9f)
-                )
-                animatorSet.duration = 200
-                animatorSet.interpolator = AccelerateInterpolator(1.5f)
-                animatorSet.addListener(object : android.animation.AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: android.animation.Animator) {
-                        deleteCustomModel(modelName, modelView)
-                        dialog.dismiss()
-                    }
-                })
-                animatorSet.start()
-            }
-        }
-
-        // 显示对话框
-        dialog.show()
-    }
-
-    /**
-     * 删除自定义模型
-     */
-    private fun deleteCustomModel(modelName: String, modelView: View) {
-        // 从存储中删除
-        val customModels = settingsManager.getCustomModels().toMutableList()
-        customModels.remove(modelName)
-        settingsManager.saveCustomModels(customModels)
-
-        // 优雅地从UI中移除
-        val initialDelay = 100L
-
-        // 创建闪烁动画
-        val initialFlash = ObjectAnimator.ofFloat(modelView, "alpha", 1f, 0.3f, 1f)
-        initialFlash.duration = 300
-        initialFlash.startDelay = initialDelay
-        initialFlash.start()
-
-        // 创建缩放和淡出动画
-        modelView.animate()
-            .alpha(0f)
-            .scaleX(0.8f)
-            .scaleY(0.8f)
-            .translationX(100f)
-            .setDuration(400)
-            .setStartDelay(initialDelay + 300)
-            .setInterpolator(AccelerateInterpolator())
-            .withEndAction {
-                // 找到该视图的前一个View
-                modelOptionsContainer?.let { container ->
-                    val index = container.indexOfChild(modelView)
-                    if (index > 0) {
-                        val previousView = container.getChildAt(index - 1)
-                        // 如果前一个是分隔线，也添加动画移除它
-                        if (previousView.layoutParams.height <= 2) {
-                            previousView.animate()
-                                .alpha(0f)
-                                .setDuration(200)
-                                .withEndAction {
-                                    container.removeView(previousView)
-                                }
-                                .start()
-                        }
-                    }
-
-                    // 延迟一点再移除主视图，让动画有时间完成
-                    modelView.postDelayed({
-                        container.removeView(modelView)
-                    }, 100)
-                }
-            }
-            .start()
-
-        // 如果当前选中的是被删除的模型，切换到默认模型并展示动画
-        if (settingsManager.modelType == modelName) {
-            // 延迟切换，让删除动画有时间完成
-            modelView.postDelayed({
-                updateModel(SettingsManager.MODEL_GPT4O_MINI)
-            }, 700)
         }
     }
 }
