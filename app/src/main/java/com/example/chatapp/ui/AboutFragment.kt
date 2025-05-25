@@ -42,7 +42,7 @@ class AboutFragment : BaseSettingsSubFragment(), BaseSettingsSubFragment.Navigat
 
         // 设置应用版本
         val versionText = view.findViewById<TextView>(R.id.app_version)
-        versionText.text = "版本：1.7"
+        versionText.text = "版本：1.8"
 
         // 设置应用图标动画
         val appIcon = view.findViewById<ShapeableImageView>(R.id.app_icon)
