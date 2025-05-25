@@ -75,7 +75,7 @@
                     android:id="@+id/app_version"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="版本：1.7"
+                    android:text="版本：1.8"
                     android:textSize="16sp"
                     android:alpha="0.8"
                     android:fontFamily="sans-serif-light"
