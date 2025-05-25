@@ -1232,6 +1232,9 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         lifecycleScope.launch {
             val chatId = viewModel.repository.currentChatId.value
             if (chatId != null) {
+                // 检查并重新处理未完成的消息
+                viewModel.checkAndReprocessIncompleteMessages()
+
                 // 如果有当前会话ID，确保消息已加载
                 viewModel.repository.loadCurrentChatMessages()
             }
