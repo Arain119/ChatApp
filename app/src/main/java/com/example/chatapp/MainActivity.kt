@@ -1910,11 +1910,31 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
     }
 
 
+    /**
+     * 观察消息列表
+     */
     private fun observeMessages() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.messages.collect { messages ->
-                    adapter.submitList(messages)
+                    adapter.submitList(messages) {
+                        if (messages.isNotEmpty()) {
+                            recyclerView.post {
+                                // 强制RecyclerView重新测量所有可见项目
+                                recyclerView.requestLayout()
+
+                                // 确保布局一致性
+                                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
+                                layoutManager?.let { lm ->
+                                    val firstVisible = lm.findFirstVisibleItemPosition()
+                                    val lastVisible = lm.findLastVisibleItemPosition()
+                                    if (firstVisible != RecyclerView.NO_POSITION && lastVisible != RecyclerView.NO_POSITION) {
+                                        adapter.notifyItemRangeChanged(firstVisible, lastVisible - firstVisible + 1)
+                                    }
+                                }
+                            }
+                        }
+                    }
 
                     // 找到所有加载指示器并添加动画
                     messages.filter { it.isProcessing }.forEach { _ ->
