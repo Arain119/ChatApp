@@ -50,8 +50,6 @@ import java.util.regex.Pattern
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
-import java.io.File
-import java.io.FileOutputStream
 
 /**
  * 聊天仓库类，处理消息的发送和接收，以及数据的持久化
@@ -147,124 +145,6 @@ class ChatRepository(private val context: Context) {
     init {
         // 初始化时尝试从SharedPreferences加载上次的会话ID
         _currentChatId.value = loadLastChatId()
-    }
-
-    /**
-     * 检查并处理未完成的消息（处理中状态的AI消息）
-     * 删除这些消息并重新发送对应的用户消息
-     */
-    suspend fun checkAndReprocessIncompleteMessages() = withContext(Dispatchers.IO) {
-        try {
-            val currentChatId = _currentChatId.value ?: return@withContext
-
-            // 获取所有消息
-            val allMessages = dbHelper.getMessagesForChatList(currentChatId)
-
-            // 查找处理中的AI消息（内容为空且是AI消息）
-            val processingMessages = allMessages.filter {
-                it.type == 1 && // AI消息
-                        it.content.isEmpty() // 内容为空，说明是未完成的消息
-            }
-
-            if (processingMessages.isNotEmpty()) {
-                Log.d(TAG, "发现 ${processingMessages.size} 条未完成的消息，准备重新处理")
-
-                // 对每个未完成的消息，找到对应的用户消息并重新发送
-                for (processingMsg in processingMessages) {
-                    // 删除未完成的AI消息
-                    dbHelper.deleteMessage(processingMsg)
-
-                    // 查找这条AI消息之前最近的用户消息
-                    val userMessages = allMessages.filter {
-                        it.type == 0 && // 用户消息
-                                it.timestamp <= processingMsg.timestamp
-                    }.sortedByDescending { it.timestamp }
-
-                    if (userMessages.isNotEmpty()) {
-                        val lastUserMessage = userMessages.first()
-
-                        Log.d(TAG, "重新发送用户消息: ${lastUserMessage.content.take(50)}...")
-
-                        // 根据消息类型重新发送
-                        when(lastUserMessage.contentType) {
-                            1 -> { // ContentType.IMAGE
-                                if (lastUserMessage.imageData != null) {
-                                    // 重新发送图片消息
-                                    val imageFile = createTempFileFromBase64(lastUserMessage.imageData)
-                                    if (imageFile != null) {
-                                        val imageUri = Uri.fromFile(imageFile)
-                                        sendImageMessage(imageUri, lastUserMessage.content)
-                                    }
-                                }
-                            }
-                            2 -> { // ContentType.IMAGE_WITH_TEXT
-                                if (lastUserMessage.imageData != null) {
-                                    // 重新发送图片+文本消息
-                                    val imageFile = createTempFileFromBase64(lastUserMessage.imageData)
-                                    if (imageFile != null) {
-                                        val imageUri = Uri.fromFile(imageFile)
-                                        sendImageMessage(imageUri, lastUserMessage.content)
-                                    }
-                                } else {
-                                    // 降级为文本消息
-                                    sendMessage(lastUserMessage.content)
-                                }
-                            }
-                            3 -> { // ContentType.DOCUMENT
-                                // 文档消息比较复杂，暂时跳过或发送文本提示
-                                Log.w(TAG, "跳过文档消息的重新发送")
-                            }
-                            else -> { // ContentType.TEXT
-                                // 重新发送文本消息
-                                sendMessage(lastUserMessage.content)
-                            }
-                        }
-                    }
-                }
-
-                // 重新加载消息列表
-                delay(1000) // 给API请求一些时间
-                loadCurrentChatMessages()
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "检查未完成消息失败: ${e.message}", e)
-        }
-    }
-
-    /**
-     * 将Base64图片数据转换为临时文件
-     */
-    private suspend fun createTempFileFromBase64(base64Image: String): File? {
-        return withContext(Dispatchers.IO) {
-            try {
-                Log.d(TAG, "转换Base64图片数据为临时文件，数据长度: ${base64Image.length}")
-
-                // 移除Base64前缀，如果有的话
-                val base64Data = if (base64Image.contains(",")) {
-                    base64Image.split(",")[1]
-                } else {
-                    base64Image
-                }
-
-                // 解码Base64数据
-                val imageBytes = android.util.Base64.decode(base64Data, android.util.Base64.DEFAULT)
-
-                // 创建临时文件
-                val tempFile = File.createTempFile("reprocess_image_", ".jpg", context.cacheDir)
-
-                // 写入图片数据
-                FileOutputStream(tempFile).use { fos ->
-                    fos.write(imageBytes)
-                    fos.flush()
-                }
-
-                Log.d(TAG, "成功创建临时图片文件: ${tempFile.absolutePath}")
-                return@withContext tempFile
-            } catch (e: Exception) {
-                Log.e(TAG, "创建临时图片文件失败: ${e.message}", e)
-                return@withContext null
-            }
-        }
     }
 
     /**
@@ -451,9 +331,6 @@ class ChatRepository(private val context: Context) {
 
                 // 重置分页状态
                 pagingManager.reset()
-
-                // 在加载消息前，先检查并处理未完成的消息
-                checkAndReprocessIncompleteMessages()
 
                 // 使用分页加载初始消息
                 val initialMessages = pagingManager.initialLoad(chatId)
@@ -943,34 +820,31 @@ class ChatRepository(private val context: Context) {
         val currentChatId = _currentChatId.value ?: return
         messageCache.cacheMessage(currentChatId, message)
 
-        // 只有非处理中的消息才保存到数据库
-        if (!message.isProcessing) {
-            // 保存到数据库
-            val messageEntity = MessageEntity(
-                id = message.id,
-                chatId = currentChatId,
-                content = message.content,
-                type = if (message.type == MessageType.USER) 0 else 1,
-                timestamp = message.timestamp,
-                isError = false,
-                imageData = message.imageData,
-                contentType = when(message.contentType) {
-                    ContentType.IMAGE -> 1
-                    ContentType.IMAGE_WITH_TEXT -> 2
-                    ContentType.DOCUMENT -> 3
-                    else -> 0
-                },
-                documentSize = message.documentSize,
-                documentType = message.documentType
-            )
+        // 保存到数据库
+        val messageEntity = MessageEntity(
+            id = message.id,
+            chatId = currentChatId,
+            content = message.content,
+            type = if (message.type == MessageType.USER) 0 else 1,
+            timestamp = message.timestamp,
+            isError = false,
+            imageData = message.imageData,
+            contentType = when(message.contentType) {
+                ContentType.IMAGE -> 1
+                ContentType.IMAGE_WITH_TEXT -> 2
+                ContentType.DOCUMENT -> 3
+                else -> 0
+            },
+            documentSize = message.documentSize,
+            documentType = message.documentType
+        )
 
-            withContext(Dispatchers.IO) {
-                dbHelper.insertMessage(messageEntity)
+        withContext(Dispatchers.IO) {
+            dbHelper.insertMessage(messageEntity)
 
-                // 更新会话最后更新时间
-                val chat = dbHelper.getChatById(currentChatId) ?: return@withContext
-                dbHelper.updateChat(chat.copy(updatedAt = Date()))
-            }
+            // 更新会话最后更新时间
+            val chat = dbHelper.getChatById(currentChatId) ?: return@withContext
+            dbHelper.updateChat(chat.copy(updatedAt = Date()))
         }
     }
 
