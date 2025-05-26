@@ -43,7 +43,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.LinearLayout
+import android.widget.LinearLayout // 确保导入
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -2714,43 +2714,94 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
 
     /**
      * 显示消息操作菜单
-     * 为所有消息类型添加操作按钮动画效果
+     * @param message 被长按的消息
+     * @param targetActionsView 要显示/隐藏的操作按钮视图 (messageActions 或 imageMessageActions)
      */
-    private fun showMessageActions(message: Message, view: View) {
-        // 添加震动反馈
-        HapticUtils.performViewHapticFeedback(view) //
+    private fun showMessageActions(message: Message, targetActionsView: View) {
+        HapticUtils.performViewHapticFeedback(targetActionsView.rootView) // 在根视图上执行震动
 
         try {
-            // 查找操作按钮区域，考虑消息类型和内容类型
-            val messageActions = when {
-                // 用户消息 + 图片类型
-                message.type == MessageType.USER &&
-                        (message.contentType == ContentType.IMAGE ||
-                                message.contentType == ContentType.IMAGE_WITH_TEXT) -> {
-                    // 尝试查找图片消息操作区
-                    view.findViewById<LinearLayout>(R.id.imageMessageActions)
-                }
-                // 普通用户消息或AI消息
-                else -> {
-                    view.findViewById<LinearLayout>(R.id.messageActions)
-                }
+            // 确保传入的是 LinearLayout，因为我们的操作按钮都在 LinearLayout 中
+            if (targetActionsView !is LinearLayout) {
+                Log.e(TAG, "targetActionsView is not a LinearLayout, it's a ${targetActionsView::class.java.simpleName}")
+                return
             }
 
-            if (messageActions != null) {
-                Log.d(TAG, "${message.type}消息长按: 切换操作按钮显示")
+            Log.d(TAG, "${message.type} 消息长按: 切换操作按钮显示 (ID: ${resources.getResourceEntryName(targetActionsView.id)})")
 
-                // 获取当前可见性状态
-                val visible = messageActions.visibility != View.VISIBLE
+            val currentVisibility = targetActionsView.visibility
+            val newVisibility = if (currentVisibility == View.VISIBLE) View.GONE else View.VISIBLE
 
-                if (visible) {
-                    // 显示操作按钮，带动画效果
-                    showActionsWithAnimation(messageActions, view)
-                } else {
-                    // 隐藏操作按钮，带动画效果
-                    hideActionsWithAnimation(messageActions, view)
+            // 根据消息类型和内容类型，正确配置按钮的可见性
+            if (newVisibility == View.VISIBLE) {
+                // 在显示之前，根据消息类型配置按钮
+                // 注意：这里的 findViewById 是在 targetActionsView 上调用的
+                val copyButton = targetActionsView.findViewById<ImageButton>(R.id.copyButton)
+                val editButton = targetActionsView.findViewById<ImageButton>(R.id.editButton)
+                val deleteButton = targetActionsView.findViewById<ImageButton>(R.id.deleteButton)
+                val regenerateButton = targetActionsView.findViewById<ImageButton>(R.id.regenerateButton)
+                val shareButton = targetActionsView.findViewById<ImageButton>(R.id.shareButton)
+                val thumbUpButton = targetActionsView.findViewById<ImageButton>(R.id.thumbUpButton)
+                val thumbDownButton = targetActionsView.findViewById<ImageButton>(R.id.thumbDownButton)
+
+                // 图片消息的特定按钮 (如果 targetActionsView 是 imageMessageActions)
+                val imageCopyButton = targetActionsView.findViewById<ImageButton>(R.id.imageCopyButton)
+                val imageEditButton = targetActionsView.findViewById<ImageButton>(R.id.imageEditButton)
+                val imageDeleteButton = targetActionsView.findViewById<ImageButton>(R.id.imageDeleteButton)
+
+
+                // --- 通用按钮显隐逻辑 ---
+                // 复制按钮：对于所有类型的消息都应该可见，除非是纯图片且无文字描述 (由 imageCopyButton 控制)
+                copyButton?.visibility = if (targetActionsView.id == R.id.messageActions) View.VISIBLE else View.GONE
+                // 删除按钮：对所有类型的消息都可见
+                deleteButton?.visibility = if (targetActionsView.id == R.id.messageActions) View.VISIBLE else View.GONE
+                imageDeleteButton?.visibility = if (targetActionsView.id == R.id.imageMessageActions) View.VISIBLE else View.GONE
+
+
+                if (message.type == MessageType.USER) {
+                    editButton?.visibility = View.VISIBLE
+                    imageEditButton?.visibility = View.VISIBLE // 用户图片消息也可以编辑
+
+                    regenerateButton?.visibility = View.GONE
+                    shareButton?.visibility = View.GONE
+                    thumbUpButton?.visibility = View.GONE
+                    thumbDownButton?.visibility = View.GONE
+                } else { // AI Message
+                    editButton?.visibility = View.GONE
+                    imageEditButton?.visibility = View.GONE // AI图片消息通常不可编辑
+
+                    regenerateButton?.visibility = View.VISIBLE
+                    shareButton?.visibility = View.VISIBLE
+                    thumbUpButton?.visibility = View.VISIBLE
+                    thumbDownButton?.visibility = View.VISIBLE
                 }
+
+                // 特别处理图片消息的复制按钮
+                if (targetActionsView.id == R.id.imageMessageActions) {
+                    if (message.content.isEmpty()) { // 纯图片
+                        imageCopyButton?.visibility = View.GONE // 纯图片不可复制文字
+                    } else {
+                        imageCopyButton?.visibility = View.VISIBLE // 带描述的图片可以复制描述
+                    }
+                }
+
+
+                // 显示操作按钮，带动画效果
+                targetActionsView.alpha = 0f
+                targetActionsView.visibility = View.VISIBLE
+                targetActionsView.animate()
+                    .alpha(1f)
+                    .setDuration(200)
+                    .start()
             } else {
-                Log.e(TAG, "未找到消息操作按钮视图，消息类型: ${message.type}, 内容类型: ${message.contentType}")
+                // 隐藏操作按钮，带动画效果
+                targetActionsView.animate()
+                    .alpha(0f)
+                    .setDuration(150)
+                    .withEndAction {
+                        targetActionsView.visibility = View.GONE
+                    }
+                    .start()
             }
         } catch (e: Exception) {
             Log.e(TAG, "显示消息操作按钮失败: ${e.message}", e)
