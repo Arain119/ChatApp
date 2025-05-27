@@ -9,13 +9,14 @@
     android:paddingEnd="16dp"
     android:paddingBottom="8dp">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/aiAvatar"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginStart="8dp"
         android:padding="0dp"
         android:src="@drawable/default_ai_avatar"
+        app:shapeAppearanceOverlay="@style/CircleImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="AI avatar" />
@@ -36,18 +37,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_default="wrap"
-        app:layout_constraintHorizontal_bias="0.0">  <TextView
-        android:id="@+id/gptMessageText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textColor="@color/text_primary"
-        android:textSize="16sp"
-        android:lineSpacingMultiplier="1.2"
-        android:autoLink="web|email|phone"
-        android:textIsSelectable="true"
-        tools:text="这是一条AI回复消息，可能会包含较长的文本和多行内容" />
+        app:layout_constraintHorizontal_bias="0.0">
 
-        <ImageView
+        <TextView
+            android:id="@+id/gptMessageText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:lineSpacingMultiplier="1.2"
+            android:autoLink="web|email|phone"
+            android:textIsSelectable="true"
+            tools:text="这是一条AI回复消息，可能会包含较长的文本和多行内容" />
+
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/aiMessageImage"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
@@ -56,8 +59,7 @@
             android:visibility="gone"
             android:layout_marginTop="8dp"
             android:contentDescription="图片消息"
-            android:background="@drawable/rounded_image_background"
-            android:clipToOutline="true"
+            app:shapeAppearanceOverlay="@style/ChatMessageRoundedImage"
             tools:visibility="visible" />
     </LinearLayout>
 
@@ -91,7 +93,7 @@
             android:padding="1dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_thumb_up"
-            android:tint="@color/text_secondary" />
+            app:tint="@color/text_secondary" />
 
         <ImageButton
             android:id="@+id/thumbDownButton"
@@ -103,7 +105,7 @@
             android:padding="1dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_thumb_down"
-            android:tint="@color/text_secondary" />
+            app:tint="@color/text_secondary" />
 
         <View
             android:layout_width="1dp"
@@ -121,7 +123,7 @@
             android:contentDescription="Copy message"
             android:padding="1dp"
             android:src="@drawable/ic_copy"
-            android:tint="@color/text_secondary" />
+            app:tint="@color/text_secondary" />
 
         <ImageButton
             android:id="@+id/shareButton"
@@ -132,7 +134,7 @@
             android:contentDescription="Share message"
             android:padding="1dp"
             android:src="@drawable/ic_share"
-            android:tint="@color/text_secondary" />
+            app:tint="@color/text_secondary" />
 
         <ImageButton
             android:id="@+id/regenerateButton"
@@ -143,7 +145,7 @@
             android:contentDescription="Regenerate response"
             android:padding="1dp"
             android:src="@drawable/ic_refresh"
-            android:tint="@color/text_secondary" />
+            app:tint="@color/text_secondary" />
 
         <ImageButton
             android:id="@+id/deleteButton"
@@ -154,7 +156,7 @@
             android:contentDescription="删除消息"
             android:padding="1dp"
             android:src="@drawable/ic_delete"
-            android:tint="@color/text_secondary" />
+            app:tint="@color/text_secondary" />
     </LinearLayout>
 
     <TextView

@@ -9,18 +9,19 @@
     android:paddingEnd="16dp"
     android:paddingBottom="8dp">
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/userAvatar"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginEnd="8dp"
         android:padding="2dp"
         android:src="@drawable/default_user_avatar"
+        app:shapeAppearanceOverlay="@style/CircleImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="用户头像" />
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/userMessageImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,8 +31,7 @@
         android:maxHeight="240dp"
         android:scaleType="centerCrop"
         android:visibility="gone"
-        android:background="@drawable/rounded_image_background"
-        android:clipToOutline="true"
+        app:shapeAppearanceOverlay="@style/ChatMessageRoundedImage"
         app:layout_constraintEnd_toStartOf="@id/userAvatar"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -95,7 +95,7 @@
             android:lineSpacingMultiplier="1.2"
             tools:text="这是一条用户消息，可能会跨越多行显示" />
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/userMessageImageInText"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
@@ -104,8 +104,7 @@
             android:visibility="gone"
             android:layout_marginTop="8dp"
             android:contentDescription="图片消息"
-            android:background="@drawable/rounded_image_background"
-            android:clipToOutline="true" />
+            app:shapeAppearanceOverlay="@style/ChatMessageRoundedImage" />
     </LinearLayout>
 
     <LinearLayout
@@ -128,7 +127,7 @@
             android:contentDescription="复制消息"
             android:padding="1dp"
             android:src="@drawable/ic_copy"
-            android:tint="@color/text_secondary" />
+            app:tint="@color/text_secondary" />
 
         <ImageButton
             android:id="@+id/editButton"
@@ -139,7 +138,7 @@
             android:contentDescription="编辑消息"
             android:padding="1dp"
             android:src="@drawable/ic_edit"
-            android:tint="@color/text_secondary" />
+            app:tint="@color/text_secondary" />
 
         <ImageButton
             android:id="@+id/deleteButton"
@@ -150,7 +149,7 @@
             android:contentDescription="删除消息"
             android:padding="1dp"
             android:src="@drawable/ic_delete"
-            android:tint="@color/text_secondary" />
+            app:tint="@color/text_secondary" />
     </LinearLayout>
 
     <LinearLayout
@@ -173,7 +172,7 @@
             android:contentDescription="复制图片描述"
             android:padding="1dp"
             android:src="@drawable/ic_copy"
-            android:tint="@color/text_secondary" />
+            app:tint="@color/text_secondary" />
 
         <ImageButton
             android:id="@+id/imageEditButton"
@@ -184,7 +183,7 @@
             android:contentDescription="编辑图片消息"
             android:padding="1dp"
             android:src="@drawable/ic_edit"
-            android:tint="@color/text_secondary" />
+            app:tint="@color/text_secondary" />
 
         <ImageButton
             android:id="@+id/imageDeleteButton"
@@ -195,7 +194,7 @@
             android:contentDescription="删除图片消息"
             android:padding="1dp"
             android:src="@drawable/ic_delete"
-            android:tint="@color/text_secondary" />
+            app:tint="@color/text_secondary" />
     </LinearLayout>
 
     <TextView
