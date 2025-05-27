@@ -1,9 +1,10 @@
 package com.example.chatapp.ui
 
-import android.animation.ObjectAnimator // 新增导入
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
-import android.content.Intent // 新增导入
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.text.Layout
@@ -15,10 +16,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageButton
-import android.widget.ImageView
+import android.widget.ImageView // 保留 ImageView 以便在 displayImage 中使用，但 ViewHolder 中的引用改为 ShapeableImageView
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout // 确保导入 ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -33,10 +34,10 @@ import com.example.chatapp.data.MessageType
 import com.example.chatapp.data.SettingsManager
 import com.example.chatapp.utils.HapticUtils
 import com.example.chatapp.utils.MarkdownFormatter
+import com.google.android.material.imageview.ShapeableImageView // 导入 ShapeableImageView
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
-import android.animation.AnimatorSet // 确保导入 AnimatorSet
 
 /**
  * 消息适配器，用于显示聊天消息
@@ -69,6 +70,7 @@ class MessageAdapter(
 
     override fun onAvatarChanged(isUserAvatar: Boolean) {
         Log.d(TAG, "收到头像变更通知: isUserAvatar=$isUserAvatar")
+        // 考虑更精细的刷新，例如 notifyItemChanged(position) 如果能确定具体位置
         notifyDataSetChanged()
     }
 
@@ -93,7 +95,7 @@ class MessageAdapter(
             if (showHeader) notifyItemInserted(0) else notifyItemRemoved(0)
         }
         if (oldShowFooter != showFooter) {
-            val pos = if (super.getItemCount() > 0) itemCount -1 else 0
+            val pos = if (super.getItemCount() > 0) itemCount -1 else 0 // itemCount 包含 header/footer
             if (showFooter) notifyItemInserted(pos) else notifyItemRemoved(pos)
         }
     }
@@ -110,16 +112,18 @@ class MessageAdapter(
         if (showLoadingFooter && position == itemCount - 1) return VIEW_TYPE_LOADING_FOOTER
 
         val dataPosition = if (showLoadingHeader) position - 1 else position
+        // 安全检查，防止 dataPosition 越界
         if (dataPosition < 0 || dataPosition >= super.getItemCount()) {
-            Log.e(TAG, "Invalid data position: $dataPosition, super.getItemCount(): ${super.getItemCount()}")
-            return VIEW_TYPE_USER
+            Log.e(TAG, "Invalid data position in getItemViewType: $dataPosition, super.getItemCount(): ${super.getItemCount()}")
+            // 返回一个默认类型或抛出异常，具体取决于你的错误处理策略
+            return VIEW_TYPE_USER // 或者其他合适的默认/错误类型
         }
         val message = getItem(dataPosition)
         return when {
             message.contentType == ContentType.DOCUMENT -> VIEW_TYPE_DOCUMENT
             message.type == MessageType.USER -> VIEW_TYPE_USER
             message.type == MessageType.AI -> VIEW_TYPE_AI
-            else -> VIEW_TYPE_USER
+            else -> VIEW_TYPE_USER // 默认
         }
     }
 
@@ -152,6 +156,7 @@ class MessageAdapter(
             return
         }
         val dataPosition = if (showLoadingHeader) position - 1 else position
+        // 安全检查
         if (dataPosition < 0 || dataPosition >= super.getItemCount()) {
             Log.e(TAG, "onBindViewHolder - Invalid data position: $dataPosition, super.getItemCount(): ${super.getItemCount()}")
             return
@@ -169,7 +174,7 @@ class MessageAdapter(
     inner class DocumentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val documentTitle: TextView = itemView.findViewById(R.id.documentTitle)
         private val documentInfo: TextView = itemView.findViewById(R.id.documentInfo)
-        private val userAvatarView: ImageView = itemView.findViewById(R.id.userAvatar)
+        private val userAvatarView: ShapeableImageView = itemView.findViewById(R.id.userAvatar) // 改为 ShapeableImageView
 
         fun bind(message: Message) {
             var displayTitle = message.content
@@ -231,7 +236,7 @@ class MessageAdapter(
         }
     }
 
-    private fun loadUserAvatar(imageView: ImageView) {
+    private fun loadUserAvatar(imageView: ShapeableImageView) { // 参数类型改为 ShapeableImageView
         try {
             val userAvatarUri = settingsManager.userAvatarUri
             if (userAvatarUri != null) {
@@ -244,7 +249,7 @@ class MessageAdapter(
                     }
                 }
                 Glide.with(imageView.context).load(uriObj)
-                    .apply(RequestOptions.circleCropTransform())
+                    // .apply(RequestOptions.circleCropTransform()) // ShapeableImageView 会处理形状
                     .skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE)
                     .error(R.drawable.default_user_avatar)
                     .into(imageView)
@@ -257,7 +262,7 @@ class MessageAdapter(
         }
     }
 
-    private fun loadAiAvatar(imageView: ImageView) {
+    private fun loadAiAvatar(imageView: ShapeableImageView) { // 参数类型改为 ShapeableImageView
         try {
             val aiAvatarUri = settingsManager.aiAvatarUri
             if (aiAvatarUri != null) {
@@ -270,7 +275,7 @@ class MessageAdapter(
                     }
                 }
                 Glide.with(imageView.context).load(uriObj)
-                    .apply(RequestOptions.circleCropTransform())
+                    // .apply(RequestOptions.circleCropTransform()) // ShapeableImageView 会处理形状
                     .skipMemoryCache(true).diskCacheStrategy(DiskCacheStrategy.NONE)
                     .error(R.drawable.default_ai_avatar)
                     .into(imageView)
@@ -291,9 +296,9 @@ class MessageAdapter(
         private val onDeleteClick: ((Message) -> Unit)?,
         private val dateFormatProvider: () -> SimpleDateFormat
     ) : RecyclerView.ViewHolder(itemView) {
-        val userAvatarView: ImageView = itemView.findViewById(R.id.userAvatar)
+        val userAvatarView: ShapeableImageView = itemView.findViewById(R.id.userAvatar)
         private val contentTextView: TextView = itemView.findViewById(R.id.userMessageText)
-        private val messageImageView: ImageView = itemView.findViewById(R.id.userMessageImage)
+        private val messageImageView: ShapeableImageView = itemView.findViewById(R.id.userMessageImage)
         private val imageCaptionTextView: TextView = itemView.findViewById(R.id.imageCaptionTextView)
         private val timeStampView: TextView = itemView.findViewById(R.id.timeStamp)
         private val imageTimeStampView: TextView = itemView.findViewById(R.id.imageTimeStamp)
@@ -328,7 +333,7 @@ class MessageAdapter(
                     setupLongTextDisplay(contentTextView)
                     timeStampView.text = timeText
                     timeStampView.visibility = View.VISIBLE
-                    val params = messageActions.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+                    val params = messageActions.layoutParams as ConstraintLayout.LayoutParams
                     params.topToBottom = R.id.userMessageContainer
                     params.endToEnd = R.id.userMessageContainer
                     messageActions.layoutParams = params
@@ -339,43 +344,71 @@ class MessageAdapter(
                     displayImage(message.imageData, messageImageView)
                     imageTimeStampView.text = timeText
                     imageTimeStampView.visibility = View.VISIBLE
-                    val params = imageMessageActions.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+                    val params = imageMessageActions.layoutParams as ConstraintLayout.LayoutParams
                     params.topToBottom = R.id.userMessageImage
                     params.endToEnd = R.id.userMessageImage
                     imageMessageActions.layoutParams = params
+                    messageActions.visibility = View.GONE // 纯图片不显示文本操作
                     setupImageOnlyLongPress(message, itemView, messageImageView)
+
+                    val tsParams = imageTimeStampView.layoutParams as ConstraintLayout.LayoutParams
+                    tsParams.topToBottom = R.id.imageMessageActions
+                    tsParams.endToEnd = R.id.userMessageImage
+                    imageTimeStampView.layoutParams = tsParams
                 }
                 ContentType.IMAGE_WITH_TEXT -> {
                     messageImageView.visibility = View.VISIBLE
                     displayImage(message.imageData, messageImageView)
-                    imageTimeStampView.text = timeText
-                    imageTimeStampView.visibility = View.VISIBLE
+                    // 对于图片+文字，统一使用 timeStampView (原本用于纯文本的) 来显示时间戳
+                    // 并且让它显示在文字描述下方
+                    timeStampView.text = timeText
+                    timeStampView.visibility = View.VISIBLE
+                    imageTimeStampView.visibility = View.GONE // 隐藏专门为图片准备的时间戳视图
 
                     if (message.content.isNotEmpty()) {
                         imageCaptionTextView.visibility = View.VISIBLE
                         MarkdownFormatter.applyMarkdownToTextView(imageCaptionTextView, message.content)
                         setupLongTextDisplay(imageCaptionTextView)
-                        val params = messageActions.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
-                        params.topToBottom = R.id.imageCaptionTextView
-                        params.endToEnd = R.id.imageCaptionTextView
-                        messageActions.layoutParams = params
+
+                        val actionParams = messageActions.layoutParams as ConstraintLayout.LayoutParams
+                        actionParams.topToBottom = R.id.imageCaptionTextView
+                        actionParams.endToEnd = R.id.imageCaptionTextView
+                        messageActions.layoutParams = actionParams
+                        imageMessageActions.visibility = View.GONE // 有文字，不显示图片专属操作
+
+                        val tsParams = timeStampView.layoutParams as ConstraintLayout.LayoutParams
+                        tsParams.topToBottom = R.id.messageActions
+                        tsParams.endToEnd = R.id.messageActions
+                        timeStampView.layoutParams = tsParams
+
                         setupImageWithCaptionLongPress(message, itemView, imageCaptionTextView)
-                    } else {
-                        val params = imageMessageActions.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
-                        params.topToBottom = R.id.userMessageImage
-                        params.endToEnd = R.id.userMessageImage
-                        imageMessageActions.layoutParams = params
+                    } else { // 如果没有文字说明，则行为类似纯图片
+                        imageCaptionTextView.visibility = View.GONE
+                        messageActions.visibility = View.GONE
+
+                        val actionParams = imageMessageActions.layoutParams as ConstraintLayout.LayoutParams
+                        actionParams.topToBottom = R.id.userMessageImage
+                        actionParams.endToEnd = R.id.userMessageImage
+                        imageMessageActions.layoutParams = actionParams // 显示图片操作按钮
+
+                        imageTimeStampView.text = timeText // 此时使用图片的时间戳视图
+                        imageTimeStampView.visibility = View.VISIBLE
+                        val tsParams = imageTimeStampView.layoutParams as ConstraintLayout.LayoutParams
+                        tsParams.topToBottom = R.id.imageMessageActions
+                        tsParams.endToEnd = R.id.userMessageImage
+                        imageTimeStampView.layoutParams = tsParams
+
                         setupImageOnlyLongPress(message, itemView, messageImageView)
                     }
                 }
-                ContentType.DOCUMENT -> { // Should be handled by DocumentViewHolder, but as a fallback
+                ContentType.DOCUMENT -> { // 已有 DocumentViewHolder，此处作为 UserMessageViewHolder 的兼容
                     userMessageContainer.visibility = View.VISIBLE
                     contentTextView.visibility = View.VISIBLE
-                    MarkdownFormatter.applyMarkdownToTextView(contentTextView, message.content)
+                    MarkdownFormatter.applyMarkdownToTextView(contentTextView, message.content) // 假设文档消息也可能包含markdown
                     setupLongTextDisplay(contentTextView)
                     timeStampView.text = timeText
                     timeStampView.visibility = View.VISIBLE
-                    val params = messageActions.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+                    val params = messageActions.layoutParams as ConstraintLayout.LayoutParams
                     params.topToBottom = R.id.userMessageContainer
                     params.endToEnd = R.id.userMessageContainer
                     messageActions.layoutParams = params
@@ -386,6 +419,7 @@ class MessageAdapter(
             copyButton.setOnClickListener { handleAction(it) { onCopyClick?.invoke(message.content) } }
             editButton.setOnClickListener { handleAction(it) { onEditClick?.invoke(message) } }
             deleteButton.setOnClickListener { handleAction(it) { onDeleteClick?.invoke(message) } }
+
             imageCopyButton.setOnClickListener { handleAction(it) { onCopyClick?.invoke(message.content) } }
             imageEditButton.setOnClickListener { handleAction(it) { onEditClick?.invoke(message) } }
             imageDeleteButton.setOnClickListener { handleAction(it) { onDeleteClick?.invoke(message) } }
@@ -412,6 +446,7 @@ class MessageAdapter(
             }
             viewsToListen.forEach { it.setOnLongClickListener(longClickListener) }
             itemView.setOnLongClickListener(longClickListener)
+
             val clickListener = View.OnClickListener {
                 HapticUtils.performViewHapticFeedback(it, false)
                 hideAllActionMenus()
@@ -419,14 +454,15 @@ class MessageAdapter(
             viewsToListen.forEach { it.setOnClickListener(clickListener) }
         }
 
-        private fun setupImageOnlyLongPress(message: Message, itemView: View, imageView: ImageView) {
+        private fun setupImageOnlyLongPress(message: Message, itemView: View, imageView: ShapeableImageView) {
             val longClickListener = View.OnLongClickListener {
                 HapticUtils.performHapticFeedback(itemView.context)
                 onLongClick?.invoke(message, imageMessageActions)
                 true
             }
             imageView.setOnLongClickListener(longClickListener)
-            itemView.setOnLongClickListener(longClickListener) // Allow long press on the whole item
+            itemView.setOnLongClickListener(longClickListener) // 允许长按整个item来触发图片操作
+
             imageView.setOnClickListener {
                 HapticUtils.performViewHapticFeedback(it, false)
                 hideAllActionMenus()
@@ -437,16 +473,17 @@ class MessageAdapter(
         private fun setupImageWithCaptionLongPress(message: Message, itemView: View, captionView: TextView) {
             val longClickListener = View.OnLongClickListener {
                 HapticUtils.performHapticFeedback(itemView.context)
-                onLongClick?.invoke(message, messageActions) // Show general actions for text part
+                onLongClick?.invoke(message, messageActions) // 长按文字说明，显示通用文本操作
                 true
             }
             captionView.setOnLongClickListener(longClickListener)
-            itemView.setOnLongClickListener(longClickListener) // Allow long press on the whole item to target text actions
+            itemView.setOnLongClickListener(longClickListener) // 允许长按整个item来触发文本操作
+
             captionView.setOnClickListener {
                 HapticUtils.performViewHapticFeedback(it, false)
                 hideAllActionMenus()
             }
-            messageImageView.setOnClickListener { // Image click still previews
+            messageImageView.setOnClickListener { // 图片点击仍然预览
                 HapticUtils.performViewHapticFeedback(it, false)
                 hideAllActionMenus()
                 message.imageData?.let { onImageClick?.invoke(it) }
@@ -462,9 +499,9 @@ class MessageAdapter(
         private val onDeleteClick: ((Message) -> Unit)?,
         private val onFeedbackClick: ((Message, Boolean) -> Unit)?
     ) : RecyclerView.ViewHolder(itemView) {
-        val aiAvatarView: ImageView = itemView.findViewById(R.id.aiAvatar)
+        val aiAvatarView: ShapeableImageView = itemView.findViewById(R.id.aiAvatar) // 改为 ShapeableImageView
         private val contentTextView: TextView = itemView.findViewById(R.id.gptMessageText)
-        private val messageImageView: ImageView = itemView.findViewById(R.id.aiMessageImage)
+        private val messageImageView: ShapeableImageView = itemView.findViewById(R.id.aiMessageImage) // 改为 ShapeableImageView
         private val timeStampView: TextView = itemView.findViewById(R.id.timeStamp)
         private val loadingIndicator: View = itemView.findViewById(R.id.loadingIndicator)
         private val messageActions: View = itemView.findViewById(R.id.messageActions)
@@ -512,7 +549,7 @@ class MessageAdapter(
                             messageActions.visibility = View.GONE
                         }
                     }
-                    ContentType.DOCUMENT -> {
+                    ContentType.DOCUMENT -> { // Should be handled by DocumentViewHolder
                         MarkdownFormatter.applyMarkdownToTextView(contentTextView, message.content)
                         contentTextView.visibility = View.VISIBLE
                         messageImageView.visibility = View.GONE
@@ -537,11 +574,14 @@ class MessageAdapter(
                     HapticUtils.performViewHapticFeedback(contentTextView, false)
                     if (messageActions.visibility == View.VISIBLE) messageActions.visibility = View.GONE
                 }
-                messageImageView.setOnClickListener {
+                // 图片点击事件已在 displayImage 中处理，如果需要长按图片也显示操作菜单，可以额外设置
+                messageImageView.setOnClickListener { // 点击图片预览
                     HapticUtils.performViewHapticFeedback(messageImageView, false)
                     if (messageActions.visibility == View.VISIBLE) messageActions.visibility = View.GONE
                     message.imageData?.let { onImageClick?.invoke(it) }
                 }
+
+
                 if (isLastItem) addEnterAnimation(itemView)
             }
         }
@@ -563,14 +603,15 @@ class MessageAdapter(
         }
 
         private fun setupFeedbackButtons(message: Message) {
-            currentFeedbackState = null
-            resetButtonState()
+            currentFeedbackState = null // 重置状态
+            resetButtonState() // 重置按钮视觉
             thumbUpButton.setOnClickListener {
                 HapticUtils.performViewHapticFeedback(thumbUpButton, false)
                 animateFeedbackButton(thumbUpButton)
-                if (currentFeedbackState == true) {
+                if (currentFeedbackState == true) { // 如果已经是赞同，再次点击取消
                     resetButtonState()
                     currentFeedbackState = null
+                    // 可选: 通知ViewModel取消反馈 onFeedbackClick?.invoke(message, null)
                 } else {
                     updateButtonState(true)
                     currentFeedbackState = true
@@ -580,9 +621,10 @@ class MessageAdapter(
             thumbDownButton.setOnClickListener {
                 HapticUtils.performViewHapticFeedback(thumbDownButton, false)
                 animateFeedbackButton(thumbDownButton)
-                if (currentFeedbackState == false) {
+                if (currentFeedbackState == false) { // 如果已经是反对，再次点击取消
                     resetButtonState()
                     currentFeedbackState = null
+                    // 可选: 通知ViewModel取消反馈 onFeedbackClick?.invoke(message, null)
                 } else {
                     updateButtonState(false)
                     currentFeedbackState = false
@@ -626,11 +668,11 @@ class MessageAdapter(
             val animDot2 = createDotAnimation(dot2)
             val animDot3 = createDotAnimation(dot3)
 
-            animDot1.start()
-            animDot2.startDelay = 150 // Corrected: set startDelay on the animator object
-            animDot2.start()
-            animDot3.startDelay = 300 // Corrected: set startDelay on the animator object
-            animDot3.start()
+            val set = AnimatorSet()
+            set.playTogether(animDot1, animDot2, animDot3)
+            animDot2.startDelay = 150
+            animDot3.startDelay = 300
+            set.start()
         }
 
         private fun createDotAnimation(dot: TextView): ObjectAnimator {
@@ -661,7 +703,7 @@ class MessageAdapter(
         }
     }
 
-    private fun displayImage(base64Image: String?, imageView: ImageView) {
+    private fun displayImage(base64Image: String?, imageView: ShapeableImageView) {
         if (base64Image.isNullOrEmpty()) {
             imageView.visibility = View.GONE
             return
@@ -670,16 +712,12 @@ class MessageAdapter(
             val imageBytes = Base64.decode(base64Image, Base64.DEFAULT)
             Glide.with(imageView.context)
                 .load(imageBytes)
-                .skipMemoryCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .transform(jp.wasabeef.glide.transformations.RoundedCornersTransformation(
-                    dpToPx(imageView.context, 16f), 0,
-                    jp.wasabeef.glide.transformations.RoundedCornersTransformation.CornerType.ALL
-                ))
+                .skipMemoryCache(true) // 考虑是否真的需要，可能会影响性能
+                .diskCacheStrategy(DiskCacheStrategy.NONE) // 考虑是否真的需要
+                // 移除了 RoundedCornersTransformation，因为 ShapeableImageView 会处理圆角
                 .error(R.drawable.ic_broken_image)
                 .into(imageView)
-            imageView.background = ContextCompat.getDrawable(imageView.context, R.drawable.rounded_image_background)
-            imageView.clipToOutline = true
+            // 确保 ShapeableImageView 的 app:shapeAppearanceOverlay 已在XML中设置
             imageView.visibility = View.VISIBLE
         } catch (e: Exception) {
             Log.e(TAG, "图片显示失败: ${e.message}")
@@ -688,9 +726,10 @@ class MessageAdapter(
         }
     }
 
-    private fun dpToPx(context: Context, dp: Float): Int {
-        return (dp * context.resources.displayMetrics.density).toInt()
-    }
+    // dpToPx 方法不再需要，因为圆角大小在 XML 中通过 dp 定义
+    // private fun dpToPx(context: Context, dp: Float): Int {
+    //     return (dp * context.resources.displayMetrics.density).toInt()
+    // }
 
     fun forceRefreshAll() {
         notifyDataSetChanged()
