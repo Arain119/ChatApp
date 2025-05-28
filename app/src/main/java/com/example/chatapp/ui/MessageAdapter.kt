@@ -685,15 +685,18 @@ class MessageAdapter(
         }
     }
 
+    // 在 MessageAdapter.addEnterAnimation 中
     private fun addEnterAnimation(itemView: View) {
-        itemView.alpha = 0f
-        val startX = if (itemView.layoutDirection == View.LAYOUT_DIRECTION_RTL) -50f else 50f
-        itemView.translationX = startX
-        itemView.animate()
-            .alpha(1f)
-            .translationX(0f)
-            .setDuration(300)
-            .start()
+        itemView.post {
+            itemView.alpha = 0f
+            val startX = if (itemView.layoutDirection == View.LAYOUT_DIRECTION_RTL) -50f else 50f
+            itemView.translationX = startX
+            itemView.animate()
+                .alpha(1f)
+                .translationX(0f)
+                .setDuration(300)
+                .start()
+        }
     }
 
     override fun onViewAttachedToWindow(holder: RecyclerView.ViewHolder) {
