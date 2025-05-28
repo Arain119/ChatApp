@@ -243,7 +243,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         setupMoreButton()
 
         // 观察消息列表
-        observeMessages()
+        observeMessages() // <--- 修改后的方法将被调用
 
         // 设置消息交互
         setupMessageInteractions()
@@ -1659,10 +1659,12 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                 // 发送用户消息
                 viewModel.sendMessage(message)
 
-                // 滚动到底部
-                recyclerView.post {
-                    recyclerView.scrollToPosition(adapter.itemCount - 1)
-                }
+                // 滚动到底部 - 在 submitList 之后处理，或者由 LayoutManager 的 stackFromEnd 处理
+                // recyclerView.post {
+                //     if (adapter.itemCount > 0) {
+                //         recyclerView.scrollToPosition(adapter.itemCount - 1)
+                //     }
+                // }
             }
         }
     }
@@ -1911,44 +1913,55 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
 
 
     /**
-     * 观察消息列表
+     * 观察消息列表 - 修改后的版本
      */
     private fun observeMessages() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.messages.collect { messages ->
-                    adapter.submitList(messages) {
-                        if (messages.isNotEmpty()) {
-                            recyclerView.post {
-                                // 强制RecyclerView重新测量所有可见项目
-                                recyclerView.requestLayout()
+                    // 直接提交列表，不使用会导致 requestLayout 的完成回调
+                    adapter.submitList(messages)
 
-                                // 确保布局一致性
-                                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
-                                layoutManager?.let { lm ->
-                                    val firstVisible = lm.findFirstVisibleItemPosition()
-                                    val lastVisible = lm.findLastVisibleItemPosition()
-                                    if (firstVisible != RecyclerView.NO_POSITION && lastVisible != RecyclerView.NO_POSITION) {
-                                        adapter.notifyItemRangeChanged(firstVisible, lastVisible - firstVisible + 1)
+                    // 滚动逻辑：当新消息出现时，如果用户接近底部，则滚动到底部
+                    if (messages.isNotEmpty()) {
+                        val lastMessage = messages.lastOrNull()
+                        val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
+                        val lastCompletelyVisibleItemPosition = layoutManager?.findLastCompletelyVisibleItemPosition() ?: -1
+                        val isNearBottomOrAtInitialLoad = lastCompletelyVisibleItemPosition == RecyclerView.NO_POSITION ||
+                                lastCompletelyVisibleItemPosition >= adapter.itemCount - 2 // 启发式：如果最后可见项是倒数第二项或更后
+
+                        // 只有当新消息是用户发送的，或者是AI完成的回复，并且用户在底部时才滚动
+                        if (lastMessage != null && (lastMessage.type == MessageType.USER || !lastMessage.isProcessing)) {
+                            if (isNearBottomOrAtInitialLoad || (layoutManager?.stackFromEnd == true && adapter.itemCount > 0 && lastCompletelyVisibleItemPosition == adapter.itemCount -2) ) { // -2 because new item is not yet visible
+                                recyclerView.post { // 使用 post 确保在布局稳定后滚动
+                                    if (adapter.itemCount > 0) {
+                                        recyclerView.scrollToPosition(adapter.itemCount - 1)
                                     }
                                 }
                             }
                         }
                     }
 
-                    // 找到所有加载指示器并添加动画
-                    messages.filter { it.isProcessing }.forEach { _ ->
-                        val lastItemPosition = adapter.itemCount - 1
-                        val lastViewHolder = recyclerView.findViewHolderForAdapterPosition(lastItemPosition)
-                        if (lastViewHolder != null && lastViewHolder is MessageAdapter.AiMessageViewHolder) {
-                            val loadingView = lastViewHolder.itemView.findViewById<View>(R.id.loadingIndicator)
-                            animateTypingIndicator(loadingView)
+                    // AI 输入指示器动画逻辑 (保持不变)
+                    messages.lastOrNull()?.let { lastMessage ->
+                        if (lastMessage.type == MessageType.AI && lastMessage.isProcessing) {
+                            recyclerView.post { // 确保 ViewHolder 可用
+                                val lastItemPosition = adapter.itemCount - 1
+                                if (lastItemPosition >= 0) {
+                                    val viewHolder = recyclerView.findViewHolderForAdapterPosition(lastItemPosition)
+                                    if (viewHolder is MessageAdapter.AiMessageViewHolder) {
+                                        val loadingView = viewHolder.itemView.findViewById<View>(R.id.loadingIndicator)
+                                        animateTypingIndicator(loadingView)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
+
 
     private fun animateTypingIndicator(view: View) {
         val dot1 = view.findViewById<TextView>(R.id.dot1)
