@@ -9,13 +9,17 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
+import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.chatapp.R
+import com.example.chatapp.utils.HapticUtils
 
 /**
  * 权限请求活动
@@ -40,12 +44,14 @@ class PermissionRequestActivity : AppCompatActivity() {
     private var exactAlarmPermissionGranted = false
     private var overlayPermissionGranted = false
     private var doNotDisturbAccessGranted = false
+    private var batteryOptimizationIgnored = false
 
     // UI组件
     private lateinit var notificationPermissionButton: Button
     private lateinit var exactAlarmPermissionButton: Button
     private lateinit var overlayPermissionButton: Button
     private lateinit var doNotDisturbPermissionButton: Button
+    private lateinit var batteryOptimizationButton: Button
     private lateinit var continueButton: Button
     private lateinit var statusText: TextView
 
@@ -58,15 +64,18 @@ class PermissionRequestActivity : AppCompatActivity() {
         exactAlarmPermissionButton = findViewById(R.id.exactAlarmPermissionButton)
         overlayPermissionButton = findViewById(R.id.overlayPermissionButton)
         doNotDisturbPermissionButton = findViewById(R.id.doNotDisturbPermissionButton)
+        batteryOptimizationButton = findViewById(R.id.batteryOptimizationButton)
         continueButton = findViewById(R.id.continueButton)
         statusText = findViewById(R.id.statusText)
 
-        // 设置点击监听器
-        notificationPermissionButton.setOnClickListener { requestNotificationPermission() }
-        exactAlarmPermissionButton.setOnClickListener { requestExactAlarmPermission() }
-        overlayPermissionButton.setOnClickListener { requestOverlayPermission() }
-        doNotDisturbPermissionButton.setOnClickListener { requestDoNotDisturbAccess() }
-        continueButton.setOnClickListener { finishWithSuccess() }
+        // 设置点击监听器并添加触觉反馈
+        notificationPermissionButton.setOnClickListener { HapticUtils.performViewHapticFeedback(it); requestNotificationPermission() }
+        exactAlarmPermissionButton.setOnClickListener { HapticUtils.performViewHapticFeedback(it); requestExactAlarmPermission() }
+        overlayPermissionButton.setOnClickListener { HapticUtils.performViewHapticFeedback(it); requestOverlayPermission() }
+        doNotDisturbPermissionButton.setOnClickListener { HapticUtils.performViewHapticFeedback(it); requestDoNotDisturbAccess() }
+        batteryOptimizationButton.setOnClickListener { HapticUtils.performViewHapticFeedback(it); requestIgnoreBatteryOptimizations() }
+        continueButton.setOnClickListener { HapticUtils.performViewHapticFeedback(it); finishWithSuccess() }
+
 
         // 检查权限状态
         checkAllPermissions()
@@ -86,7 +95,7 @@ class PermissionRequestActivity : AppCompatActivity() {
                 android.Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
         } else {
-            true // 对于旧版本，通知权限隐含授予
+            true
         }
 
         // 检查精确闹钟权限
@@ -94,7 +103,7 @@ class PermissionRequestActivity : AppCompatActivity() {
             val alarmManager = getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
             alarmManager.canScheduleExactAlarms()
         } else {
-            true // 对于旧版本，精确闹钟权限隐含授予
+            true
         }
 
         // 检查悬浮窗权限
@@ -104,12 +113,19 @@ class PermissionRequestActivity : AppCompatActivity() {
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         doNotDisturbAccessGranted = notificationManager.isNotificationPolicyAccessGranted
 
+        // 检查电池优化权限
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        batteryOptimizationIgnored = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            powerManager.isIgnoringBatteryOptimizations(packageName)
+        } else {
+            true
+        }
+
         // 更新UI
         updatePermissionUI()
     }
 
     private fun updatePermissionUI() {
-        // 更新按钮状态
         notificationPermissionButton.isEnabled = !notificationPermissionGranted
         notificationPermissionButton.text = if (notificationPermissionGranted) "✓ 通知权限" else "请求通知权限"
 
@@ -122,13 +138,17 @@ class PermissionRequestActivity : AppCompatActivity() {
         doNotDisturbPermissionButton.isEnabled = !doNotDisturbAccessGranted
         doNotDisturbPermissionButton.text = if (doNotDisturbAccessGranted) "✓ 免打扰模式访问权限" else "请求免打扰模式访问权限"
 
+        // 更新电池优化按钮UI
+        batteryOptimizationButton.isEnabled = !batteryOptimizationIgnored
+        batteryOptimizationButton.text = if (batteryOptimizationIgnored) "✓ 已忽略电池优化" else "请求忽略电池优化"
+
         // 检查是否所有权限都已授予
         val allPermissionsGranted = notificationPermissionGranted &&
                 exactAlarmPermissionGranted &&
                 overlayPermissionGranted &&
-                doNotDisturbAccessGranted
+                doNotDisturbAccessGranted &&
+                batteryOptimizationIgnored
 
-        // 更新继续按钮和状态文本
         continueButton.isEnabled = allPermissionsGranted
 
         if (allPermissionsGranted) {
@@ -153,14 +173,12 @@ class PermissionRequestActivity : AppCompatActivity() {
     private fun requestExactAlarmPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             try {
-                // 引导用户到设置页面
                 Intent().apply {
                     action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
                     startActivity(this)
                 }
             } catch (e: Exception) {
-                // 如果没有适当的设置页面，显示对话框指导用户
-                showManualPermissionDialog("精确闹钟权限",
+                showAnimatedPermissionDialog("精确闹钟权限",
                     "请在设置 > 应用 > ChatApp > 权限中允许设置精确闹钟")
             }
         }
@@ -184,9 +202,28 @@ class PermissionRequestActivity : AppCompatActivity() {
         }
     }
 
-    private fun showManualPermissionDialog(permissionName: String, instructionText: String) {
-        AlertDialog.Builder(this)
-            .setTitle("需要$permissionName")
+    /**
+     * 请求忽略电池优化
+     */
+    private fun requestIgnoreBatteryOptimizations() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+            intent.data = Uri.parse("package:$packageName")
+            try {
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "请在电池设置中手动将本应用设为“不受限制”", Toast.LENGTH_LONG).show()
+                startActivity(Intent(Settings.ACTION_SETTINGS))
+            }
+        }
+    }
+
+    /**
+     * 显示带有动画效果的引导对话框
+     */
+    private fun showAnimatedPermissionDialog(permissionName: String, instructionText: String) {
+        val dialog = AlertDialog.Builder(this, R.style.AlertDialogTheme)
+            .setTitle("需要 $permissionName")
             .setMessage(instructionText)
             .setPositiveButton("去设置") { _, _ ->
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -194,7 +231,16 @@ class PermissionRequestActivity : AppCompatActivity() {
                 startActivity(intent)
             }
             .setNegativeButton("取消", null)
-            .show()
+            .create()
+
+        // 设置动画
+        dialog.window?.attributes?.windowAnimations = R.style.DialogAnimation
+
+        dialog.show()
+    }
+
+    private fun showManualPermissionDialog(permissionName: String, instructionText: String) {
+        showAnimatedPermissionDialog(permissionName, instructionText)
     }
 
     override fun onRequestPermissionsResult(
@@ -214,8 +260,6 @@ class PermissionRequestActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        // 当从其他设置页面返回时，刷新权限状态
         checkAllPermissions()
     }
 
