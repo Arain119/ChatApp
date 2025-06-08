@@ -6,6 +6,7 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.animation.ValueAnimator
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -26,6 +27,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
@@ -82,6 +84,7 @@ import com.example.chatapp.viewmodel.ChatViewModel
 import com.example.chatapp.viewmodel.FeedbackViewModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -243,7 +246,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         setupMoreButton()
 
         // 观察消息列表
-        observeMessages() // <--- 修改后的方法将被调用
+        observeMessages()
 
         // 设置消息交互
         setupMessageInteractions()
@@ -275,9 +278,52 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         // 检查通知权限
         checkNotificationPermission()
 
-        // 检查精确闹钟权限
-        alarmManagerService.checkExactAlarmPermission(this) // 使用全限定名
+        // 【新增】在 onCreate 的末尾添加首次启动检查
+        checkFirstRunAndShowDialog()
     }
+
+    /**
+     * 【新增】检查是否为首次运行，如果是，则显示引导对话框
+     */
+    private fun checkFirstRunAndShowDialog() {
+        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val isFirstRun = prefs.getBoolean("is_first_run", true)
+
+        if (isFirstRun) {
+            showWelcomeAndPermissionDialog()
+            // 标记为非首次运行
+            prefs.edit().putBoolean("is_first_run", false).apply()
+        }
+    }
+
+    /**
+     * 显示欢迎和权限引导对话框
+     */
+    private fun showWelcomeAndPermissionDialog() {
+        MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_App_MaterialAlertDialog)
+            .setTitle("欢迎使用 Alice！")
+            .setMessage("为了确保闹钟和 AI 自动日记等功能能准时在后台为您服务，建议您允许应用在后台运行。\n\n这通常需要您在手机的“电池管理”或“应用启动管理”中，为 Alice 打开“允许后台活动”以及“自启动”权限。")
+            .setPositiveButton("前往设置") { dialog, _ ->
+                try {
+                    // 尝试引导用户到电池优化设置
+                    val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    // 如果上述 Intent 无法处理，提供一个更通用的设置 Intent
+                    try {
+                        startActivity(Intent(Settings.ACTION_SETTINGS))
+                        Toast.makeText(this, "请在设置中找到电池或应用管理选项", Toast.LENGTH_LONG).show()
+                    } catch (e2: Exception) {
+                        Toast.makeText(this, "无法打开系统设置，请手动前往", Toast.LENGTH_LONG).show()
+                    }
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton("我知道了", null)
+            .setCancelable(false) // 确保用户看到这个重要的提示
+            .show()
+    }
+
 
     /**
      * 应用保存的颜色主题
@@ -1331,7 +1377,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                     // 按下动画效果
                     startTitlePressAnimation(titleTextView)
 
-                    // 提供即时触觉反馈
+                    // 提供即时的触觉反馈
                     HapticUtils.performHapticFeedback(this@MainActivity, false) //
                     true
                 }
@@ -1391,14 +1437,14 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                 ObjectAnimator.ofFloat(titleView, "scaleX", 1f, 0.65f),
                 ObjectAnimator.ofFloat(titleView, "scaleY", 1f, 0.65f)
             )
-            duration = 80
-            interpolator = AccelerateInterpolator(2.0f)
+            // 减少持续时间使动画更快
+            duration = 80  // 从120ms减少到80ms
+            // 使用加速插值器
+            interpolator = AccelerateInterpolator(2.0f)  // 加大加速力度
         }
-
         // 改变文字颜色为主题色
         val primaryColor = ContextCompat.getColor(this, R.color.primary)
         titleView.setTextColor(primaryColor)
-
         // 启动动画
         scaleDown.start()
     }
@@ -1658,16 +1704,10 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
 
                 // 发送用户消息
                 viewModel.sendMessage(message)
-
-                // 滚动到底部 - 在 submitList 之后处理，或者由 LayoutManager 的 stackFromEnd 处理
-                // recyclerView.post {
-                //     if (adapter.itemCount > 0) {
-                //         recyclerView.scrollToPosition(adapter.itemCount - 1)
-                //     }
-                // }
             }
         }
     }
+
 
     /**
      * 分析并设置/取消闹钟
