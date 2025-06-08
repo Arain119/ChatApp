@@ -67,6 +67,14 @@
             android:layout_height="wrap_content"
             android:text="请求免打扰模式访问权限"
             android:layout_marginBottom="16dp"/>
+
+        <!-- 【新增】电池优化按钮 -->
+        <Button
+            android:id="@+id/batteryOptimizationButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="请求忽略电池优化"
+            android:layout_marginBottom="16dp"/>
     </LinearLayout>
 
     <TextView
