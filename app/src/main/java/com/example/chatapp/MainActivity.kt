@@ -300,8 +300,24 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
      * 显示欢迎和权限引导对话框
      */
     private fun showWelcomeAndPermissionDialog() {
+        // 1. 创建一个 TextView 并将其样式设置为标题
+        val customTitleView = TextView(this).apply {
+            text = "欢迎使用 Alice！"
+            // 2. 设置一个更大的字号
+            textSize = 18f
+            // 3. 设置为粗体
+            typeface = Typeface.DEFAULT_BOLD
+            // 4. 设置与默认标题相似的颜色和内边距
+            setTextColor(ContextCompat.getColor(this@MainActivity, R.color.text_primary))
+            val padding = (24 * resources.displayMetrics.density).toInt()
+            val bottomPadding = (12 * resources.displayMetrics.density).toInt()
+            setPadding(padding, padding, padding, bottomPadding)
+            gravity = Gravity.START
+        }
+
+        // 5. 使用 .setCustomTitle() 来应用你的自定义标题
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_App_MaterialAlertDialog)
-            .setTitle("欢迎使用 Alice！")
+            .setCustomTitle(customTitleView) // 使用自定义标题视图
             .setMessage("为了确保闹钟和 AI 自动日记等功能能准时在后台为您服务，建议您允许应用在后台运行。\n\n这通常需要您在手机的“电池管理”或“应用启动管理”中，为 Alice 打开“允许后台活动”以及“自启动”权限。")
             .setPositiveButton("前往设置") { dialog, _ ->
                 try {
@@ -320,7 +336,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                 dialog.dismiss()
             }
             .setNegativeButton("我知道了", null)
-            .setCancelable(false) // 确保用户看到这个重要的提示
+            .setCancelable(false)
             .show()
     }
 
