@@ -1967,41 +1967,34 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         animSequence.start()
     }
 
-
     /**
      * 观察消息列表 - 修改后的版本
      */
     private fun observeMessages() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
+                var isInitialLoad = true
+                var lastHandledCount = 0
+
                 viewModel.messages.collect { messages ->
-                    // 直接提交列表，不使用会导致 requestLayout 的完成回调
-                    adapter.submitList(messages)
+                    val wasNearBottom = isUserNearBottom() || isInitialLoad
+                    val newItemsAdded = messages.size > lastHandledCount
+                    lastHandledCount = messages.size
+                    isInitialLoad = false
 
-                    // 滚动逻辑：当新消息出现时，如果用户接近底部，则滚动到底部
-                    if (messages.isNotEmpty()) {
-                        val lastMessage = messages.lastOrNull()
-                        val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
-                        val lastCompletelyVisibleItemPosition = layoutManager?.findLastCompletelyVisibleItemPosition() ?: -1
-                        val isNearBottomOrAtInitialLoad = lastCompletelyVisibleItemPosition == RecyclerView.NO_POSITION ||
-                                lastCompletelyVisibleItemPosition >= adapter.itemCount - 2 // 启发式：如果最后可见项是倒数第二项或更后
-
-                        // 只有当新消息是用户发送的，或者是AI完成的回复，并且用户在底部时才滚动
-                        if (lastMessage != null && (lastMessage.type == MessageType.USER || !lastMessage.isProcessing)) {
-                            if (isNearBottomOrAtInitialLoad || (layoutManager?.stackFromEnd == true && adapter.itemCount > 0 && lastCompletelyVisibleItemPosition == adapter.itemCount -2) ) { // -2 because new item is not yet visible
-                                recyclerView.post { // 使用 post 确保在布局稳定后滚动
-                                    if (adapter.itemCount > 0) {
-                                        recyclerView.scrollToPosition(adapter.itemCount - 1)
-                                    }
-                                }
+                    adapter.submitList(messages) {
+                        // 滚动逻辑：仅当新消息到来且用户在底部时滚动
+                        if (newItemsAdded && wasNearBottom && adapter.itemCount > 0) {
+                            recyclerView.post {
+                                recyclerView.smoothScrollToPosition(adapter.itemCount - 1)
                             }
                         }
                     }
 
-                    // AI 输入指示器动画逻辑 (保持不变)
+                    // AI输入指示器动画逻辑 (保持不变)
                     messages.lastOrNull()?.let { lastMessage ->
                         if (lastMessage.type == MessageType.AI && lastMessage.isProcessing) {
-                            recyclerView.post { // 确保 ViewHolder 可用
+                            recyclerView.post {
                                 val lastItemPosition = adapter.itemCount - 1
                                 if (lastItemPosition >= 0) {
                                     val viewHolder = recyclerView.findViewHolderForAdapterPosition(lastItemPosition)
@@ -2016,6 +2009,24 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
                 }
             }
         }
+    }
+
+    /**
+     * 辅助函数，检查用户是否接近列表底部
+     */
+    private fun isUserNearBottom(): Boolean {
+        val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return true
+        val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
+        val totalItemCount = layoutManager.itemCount
+
+        // 如果列表为空或未完全显示，则视为“在底部”
+        if (totalItemCount <= 0 || lastVisibleItemPosition == RecyclerView.NO_POSITION) {
+            return true
+        }
+
+        // 如果最后可见的项目是最后两个项目之一，则认为在底部附近。
+        // 这提供了一个缓冲区，因此用户不必滚动到*完全*底部。
+        return lastVisibleItemPosition >= totalItemCount - 2
     }
 
 
