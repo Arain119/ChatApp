@@ -48,7 +48,7 @@ import java.util.Date
 import java.util.UUID
 import java.util.regex.Pattern
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 
 /**
@@ -56,6 +56,9 @@ import kotlinx.coroutines.async
  */
 class ChatRepository(private val context: Context) {
     private val TAG = "ChatRepository"
+
+    // 【推荐优化】使用一个与仓库生命周期绑定的、可管理的协程作用域，而不是GlobalScope
+    private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     // 数据库助手
     private val dbHelper = ChatDatabaseHelper.getInstance(context)
@@ -113,6 +116,7 @@ class ChatRepository(private val context: Context) {
 
     // 人设记忆相关计数器
     private var messageCountSinceLastPersonaAnalysis = 0
+    private var pendingTitleGeneration = false
 
     // 持久化存储的键前缀
     private val MEMORY_COUNTER_PREFS = "memory_counters"
@@ -292,6 +296,9 @@ class ChatRepository(private val context: Context) {
 
             // 重置分页状态
             pagingManager.reset()
+
+            // 标记需要生成标题
+            pendingTitleGeneration = true
 
             // 加载AI人设
             if (aiPersona.isNotEmpty()) {
@@ -1071,20 +1078,24 @@ class ChatRepository(private val context: Context) {
 
                     dbHelper.insertMessage(userMessageEntity)
 
-                    // 处理对话轮次，学习用户偏好
-                    processDialogTurn(caption, aiResponse, chatId)
+                    // 【核心修改】将耗时任务放入独立的协程中执行
+                    repositoryScope.launch {
+                        try {
+                            if (pendingTitleGeneration) {
+                                pendingTitleGeneration = false
+                                generateAndUpdateTitle(chatId, caption.ifEmpty { "图片分享" })
+                            }
+                            processDialogTurn(caption, aiResponse, chatId)
+                            checkAndGenerateMemory(chatId)
+                            checkAndUpdateUserProfile(chatId)
+                            analyzeAndExtractPersonaMemories(chatId)
+                        } catch (e: Exception) {
+                            Log.e(TAG, "后台分析任务执行失败: ${e.message}", e)
+                        }
+                    }
 
                     // 记录AI消息，用于后续反馈分析
                     feedbackManager.recordAiMessage(aiMessage, chatId)
-
-                    // 检查并生成记忆
-                    checkAndGenerateMemory(currentChatId!!)
-
-                    // 检查并更新用户画像
-                    checkAndUpdateUserProfile(currentChatId)
-
-                    // 分析并提取人设记忆
-                    analyzeAndExtractPersonaMemories(currentChatId)
 
                     return@withContext Result.success(aiMessage)
                 } else {
@@ -1257,15 +1268,21 @@ class ChatRepository(private val context: Context) {
                         feedbackManager.recordAiMessage(aiMessage, chatId)
                     }
 
-                    // 处理对话轮次，学习用户偏好
-                    processDialogTurn(userMessage.content, aiResponse, currentChatId!!)
-
-                    // 处理完成后生成记忆和更新用户画像
-                    checkAndGenerateMemory(currentChatId)
-                    checkAndUpdateUserProfile(currentChatId)
-
-                    // 分析并提取人设记忆
-                    analyzeAndExtractPersonaMemories(currentChatId)
+                    // 【核心修改】将耗时任务放入独立的协程中执行
+                    repositoryScope.launch {
+                        try {
+                            if (pendingTitleGeneration) {
+                                pendingTitleGeneration = false
+                                generateAndUpdateTitle(chatId!!, "文档：$fileName")
+                            }
+                            processDialogTurn(userMessage.content, aiResponse, chatId!!)
+                            checkAndGenerateMemory(chatId)
+                            checkAndUpdateUserProfile(chatId)
+                            analyzeAndExtractPersonaMemories(chatId)
+                        } catch (e: Exception) {
+                            Log.e(TAG, "后台分析任务执行失败: ${e.message}", e)
+                        }
+                    }
 
                     return@withContext Result.success(aiMessage)
                 } else {
@@ -1326,7 +1343,7 @@ class ChatRepository(private val context: Context) {
             }
 
             // 启动异步分析AI回复
-            GlobalScope.launch {
+            repositoryScope.launch {
                 try {
                     // 分析AI消息，提取人设特征
                     val success = personaMemorySystem.analyzeImportedChatForPersona(
@@ -1651,7 +1668,7 @@ class ChatRepository(private val context: Context) {
             Log.d(TAG, "已达到人设记忆分析阈值，准备提取人设记忆")
 
             // 异步处理人设记忆提取，不阻塞主流程
-            GlobalScope.launch {
+            repositoryScope.launch {
                 try {
                     // 获取最近的消息
                     val allMessages = dbHelper.getMessagesForChatList(chatId)
@@ -2136,32 +2153,28 @@ class ChatRepository(private val context: Context) {
                 // 记录AI消息，用于后续反馈分析
                 feedbackManager.recordAiMessage(aiMessage, chatId)
 
-                // 更新聊天标题（如果是第一条消息）
-                withContext(Dispatchers.IO) {
-                    val currentChatId = _currentChatId.value ?: return@withContext
-                    val messageCount = dbHelper.getMessageCountForChat(currentChatId)
-
-                    // 如果只有2条消息（用户和AI各一条），则使用用户消息作为标题
-                    if (messageCount <= 2) {
-                        var title = content
-                        if (title.length > 20) {
-                            title = title.substring(0, 20) + "..."
+                // 【核心修改】将耗时任务放入独立的协程中执行
+                repositoryScope.launch {
+                    try {
+                        val currentChatIdVal = _currentChatId.value ?: return@launch
+                        if (pendingTitleGeneration) {
+                            pendingTitleGeneration = false
+                            generateAndUpdateTitle(currentChatIdVal, content)
                         }
-                        updateChatTitle(currentChatId, title)
+
+                        // 处理对话轮次，学习用户偏好
+                        processDialogTurn(content, aiResponse, currentChatIdVal)
+                        // 检查并生成记忆
+                        checkAndGenerateMemory(currentChatIdVal)
+                        // 检查并更新用户画像
+                        checkAndUpdateUserProfile(currentChatIdVal)
+                        // 分析并提取人设记忆
+                        analyzeAndExtractPersonaMemories(currentChatIdVal)
+                    } catch(e: Exception) {
+                        Log.e(TAG, "后台分析任务执行失败: ${e.message}", e)
                     }
-
-                    // 处理对话轮次，学习用户偏好
-                    processDialogTurn(content, aiResponse, currentChatId)
-
-                    // 检查并生成记忆
-                    checkAndGenerateMemory(currentChatId)
-
-                    // 检查并更新用户画像
-                    checkAndUpdateUserProfile(currentChatId)
-
-                    // 分析并提取人设记忆
-                    analyzeAndExtractPersonaMemories(currentChatId)
                 }
+
 
                 return@withContext Result.success(aiMessage)
             } else {
@@ -2194,6 +2207,152 @@ class ChatRepository(private val context: Context) {
             Log.e(TAG, "发送消息异常: ${e.message}", e)
             handleError(aiMessagePlaceholder.id, "发生错误: ${e.message ?: "未知错误"}")
             return@withContext Result.failure(e)
+        }
+    }
+
+    /**
+     * 生成并更新聊天标题
+     */
+    private suspend fun generateAndUpdateTitle(chatId: String, firstMessage: String) {
+        try {
+            // 生成标题
+            val title = GptTitleGenerator().generateTitle(firstMessage)
+
+            // 更新标题
+            updateChatTitle(chatId, title)
+
+            Log.d(TAG, "已生成标题: $title")
+        } catch (e: Exception) {
+            Log.e(TAG, "生成标题失败: ${e.message}", e)
+
+            // 如果AI生成失败，使用备用方法生成
+            val fallbackTitle = generateFallbackTitle(firstMessage)
+            updateChatTitle(chatId, fallbackTitle)
+
+            Log.d(TAG, "使用备用方法生成标题: $fallbackTitle")
+        }
+    }
+
+    /**
+     * 备用的标题生成方法（当API请求失败时使用）
+     */
+    private fun generateFallbackTitle(message: String): String {
+        // 清理消息内容
+        val cleanMessage = message.trim()
+            .replace("\n", " ")
+            .replace(Regex("\\s+"), " ")
+
+        // 如果消息很短，直接使用
+        if (cleanMessage.length <= 20) {
+            return cleanMessage
+        }
+
+        // 尝试提取问题
+        val questionPattern = Regex("[^。？！.?!]*[？?]")
+        val questions = questionPattern.findAll(cleanMessage)
+
+        for (question in questions) {
+            val text = question.value.trim()
+            if (text.length in 5..25) {
+                return text
+            }
+        }
+
+        // 截取前20个字符作为标题并添加省略号
+        return cleanMessage.substring(0, 20) + "..."
+    }
+
+    /**
+     * GPT标题生成器 - 使用API生成智能标题
+     */
+    inner class GptTitleGenerator {
+        /**
+         * 使用GPT API生成聊天标题
+         * @param message 用户的第一条消息
+         * @return 生成的标题，如果生成失败则返回默认标题
+         */
+        suspend fun generateTitle(message: String): String {
+            // 消息为空或太短时使用默认标题
+            if (message.isBlank() || message.length < 3) {
+                return "新对话"
+            }
+
+            return withContext(Dispatchers.IO) {
+                try {
+                    // 构建用于生成标题的提示
+                    val titlePrompt = buildTitlePrompt(message)
+
+                    // 构建API请求
+                    val messages = listOf(
+                        ChatMessage("system", "你是一个专门用来提取对话主题并生成简短标题的助手。你的回答应该只包含标题，不包含任何其他内容。"),
+                        ChatMessage("user", titlePrompt)
+                    )
+
+                    val request = ChatGptRequest(
+                        model = getCurrentModelFromSettings(), // 使用仓库的方法
+                        messages = messages,
+                        temperature = 0.3 // 低温度使输出更加确定性和精确
+                    )
+
+                    // 发送API请求
+                    val response = ApiClient.apiService.sendMessage(
+                        ApiClient.getAuthHeader(),
+                        request
+                    )
+
+                    if (response.isSuccessful && response.body() != null) {
+                        // 提取API返回的标题
+                        val title = response.body()!!.choices[0].message.content.toString().trim()
+
+                        // 处理可能的异常情况
+                        if (title.length > 30) {
+                            // 标题过长，截取
+                            title.substring(0, 30) + "..."
+                        } else if (title.startsWith("标题：") || title.startsWith("Title:")) {
+                            // 删除前缀
+                            title.substringAfter("：").substringAfter(":").trim()
+                        } else if (title.contains("\"") || title.contains("'")) {
+                            // 删除引号
+                            title.replace("\"", "").replace("'", "").trim()
+                        } else {
+                            title
+                        }
+                    } else {
+                        // API请求失败，使用备用生成方法
+                        Log.w(TAG, "API生成标题失败，使用本地生成: ${response.code()}")
+                        generateFallbackTitle(message)
+                    }
+                } catch (e: Exception) {
+                    // 异常处理，使用备用方法生成
+                    Log.e(TAG, "AI标题生成异常: ${e.message}", e)
+                    generateFallbackTitle(message)
+                }
+            }
+        }
+
+        /**
+         * 构建标题生成提示
+         */
+        private fun buildTitlePrompt(message: String): String {
+            // 为了限制token消耗，可能需要裁剪长消息
+            val truncatedMessage = if (message.length > 500) {
+                message.substring(0, 500) + "..."
+            } else {
+                message
+            }
+
+            return """
+            请为以下用户消息生成一个简短、精确的对话标题。标题应不超过15个字符：
+
+            用户消息：$truncatedMessage
+
+            要求：
+            1. 提炼核心主题或问题
+            2. 标题必须简短清晰
+            3. 不要使用"关于..."、"请求..."等开头词
+            4. 不要使用标点符号
+            5. 直接输出标题，不要有任何其他内容
+            """.trimIndent()
         }
     }
 
