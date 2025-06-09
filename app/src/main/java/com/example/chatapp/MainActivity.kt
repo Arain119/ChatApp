@@ -1290,15 +1290,6 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         // 检查位置权限并请求
         checkAndRequestLocationPermissions()
 
-        // 当应用恢复时，确保消息列表正确显示
-        lifecycleScope.launch {
-            val chatId = viewModel.repository.currentChatId.value
-            if (chatId != null) {
-                // 如果有当前会话ID，确保消息已加载
-                viewModel.repository.loadCurrentChatMessages()
-            }
-        }
-
         // 刷新AI名称
         updateAIName()
 
@@ -1516,7 +1507,7 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
         if (isTitleAnimating) return
         isTitleAnimating = true
 
-        // 震动反馈
+        // 执行强震动反馈
         HapticUtils.performHapticFeedback(applicationContext, true) //
 
         // 获取根视图
