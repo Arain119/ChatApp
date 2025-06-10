@@ -202,8 +202,10 @@ class MainActivity : AppCompatActivity(), MoreOptionsBottomSheet.MoreOptionsList
 
             // 确保 RecyclerView 在键盘弹出时能滚动到底部
             if (imeInsets.bottom > 0 && adapter.itemCount > 0) {
+                // 使用 post 确保滚动操作在下一次布局计算后执行，避免潜在错误
                 recyclerView.post {
-                    recyclerView.scrollToPosition(adapter.itemCount - 1)
+                    // 平滑滚动，统一用户体验
+                    recyclerView.smoothScrollToPosition(adapter.itemCount - 1)
                 }
             }
             insets
